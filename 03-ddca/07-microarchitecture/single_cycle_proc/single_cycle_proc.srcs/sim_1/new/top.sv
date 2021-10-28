@@ -29,7 +29,7 @@ module top(
     logic [31:0] pc, instr, read_data;
 
     // Init processor and mems.
-    mips mips(clk, reset, pc, instr, mem_write, data_adr);
+    mips mips(clk, reset, pc, instr, mem_write, data_adr, write_data, read_data);
     imem imem(pc[7:2], instr);
     dmem dmem(clk, mem_write, data_adr, write_data, read_data);
 endmodule

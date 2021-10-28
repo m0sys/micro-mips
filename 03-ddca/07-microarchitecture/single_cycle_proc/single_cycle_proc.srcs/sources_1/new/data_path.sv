@@ -34,7 +34,7 @@ module data_path(
     );
 
     // Define n-bit machine type.
-    `define BIT_WIDTH 32
+    // `define BIT_WIDTH 32
 
     logic [4:0] write_reg;
     logic [31:0] pc_next, pc_next_br, pc_plus4, pc_branch;
@@ -43,12 +43,12 @@ module data_path(
     logic [31:0] res;
 
     // Next PC logic.
-    flopr #(BIT_WIDTH) pc_reg(clk, reset, pc_next, pc);
+    flopr #(32) pc_reg(clk, reset, pc_next, pc);
     adder pc_add1(pc, 32'b100, pc_plus4);
     s12 immsh(sign_imm, sign_immsh);
     adder pc_add2(pc_plus4, sign_immsh, pc_branch);
-    mux2 #(BIT_WIDTH) pc_br_mux(pc_plus4, pc_branch, pc_src, pc_next_br);
-    mux2 #(BIT_WIDTH) pc_mux(pc_next_br, { pc_plus4[31:28], instr[25:0], 2'b00 },
+    mux2 #(32) pc_br_mux(pc_plus4, pc_branch, pc_src, pc_next_br);
+    mux2 #(32) pc_mux(pc_next_br, { pc_plus4[31:28], instr[25:0], 2'b00 },
                             jump, pc_next); 
 
     // Register file logic.
@@ -56,10 +56,10 @@ module data_path(
                 write_reg, res, src_a, write_data);
     mux2 #(5) wr_mux(instr[20:16], instr[15:11],
                      reg_dst, write_reg);
-    mux2 #(BIT_WIDTH) res_mux(alu_out, read_data, mem_to_reg, res);
+    mux2 #(32) res_mux(alu_out, read_data, mem_to_reg, res);
     sign_ext se(instr[15:0], sign_imm);
 
     // ALU logic.
-    mux2 #(BIT_WIDTH) src_b_mux(write_data, sign_imm, alu_src, src_b);
+    mux2 #(32) src_b_mux(write_data, sign_imm, alu_src, src_b);
     alu alu(src_a, src_b, alu_control, alu_out, zero);
 endmodule

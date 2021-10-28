@@ -30,16 +30,18 @@ module alu(
     // 32-bit alu.
     //
     // Define n-bit machine type.
-    `define BIT_WIDTH 32
+    // TODO: Figure out how to pass constants as parameter in verilog.
+    // `define BIT_WIDTH 32
 
-    logic [BIT_WIDTH-1:0] b_selected, or_res, and_res, zero_res, add_res;
-    mux2 #(BIT_WIDTH) b_sel(b, not b, ctrl[2], b_selected);
+    logic [32-1:0] b_logical_sel, b_arith_sel, or_res, and_res, zero_res, add_res;
+    mux2 #(32) ba_sel(b, ~b, ctrl[2], b_logical_sel);
+    mux2 #(32) bl_sel(b, -b, ctrl[2], b_arith_sel);
 
-    assign or_res=a|b_selected;
-    assign and_res=a&b_selected; 
-    assign add_res=a+b_selected;
-    zero_ext zext(add_res[BIT_WIDTH-1], zero_res);
+    assign or_res=a|b_logical_sel;
+    assign and_res=a&b_logical_sel; 
+    assign add_res=a+b_arith_sel;
+    zero_ext zext(add_res[32-1], zero_res);
 
-    mux4 #(BIT_WIDTH) res_mux(and_res, or_res, add_res, zero_res, ctrl[1:0], y);
+    mux4 #(32) res_mux(and_res, or_res, add_res, zero_res, ctrl[1:0], y);
     assign zero_y = (y == 0) ? 1 : 0;
 endmodule
