@@ -36,6 +36,9 @@ module data_path(
     // Define n-bit machine type.
     // `define BIT_WIDTH 32
 
+    // NOTE: I'm not fond of comments when possible to avoid - but
+    //       this language's expressiveness sucks. 
+
     logic [4:0] write_reg;
     logic [31:0] pc_next, pc_next_br, pc_plus4, pc_branch;
     logic [31:0] sign_imm, sign_immsh;
@@ -44,22 +47,27 @@ module data_path(
 
     // Next PC logic.
     flopr #(32) pc_reg(clk, reset, pc_next, pc);
-    adder pc_add1(pc, 32'b100, pc_plus4);
+    adder pc_add1(pc, 32'b100, pc_plus4); // byte incr pc adder
     s12 immsh(sign_imm, sign_immsh);
-    adder pc_add2(pc_plus4, sign_immsh, pc_branch);
+    adder pc_add2(pc_plus4, sign_immsh, pc_branch); // branch pc adder
+    // Determines whether to take the target branch or the pcplus4 addr.
     mux2 #(32) pc_br_mux(pc_plus4, pc_branch, pc_src, pc_next_br);
+    // Determines whether to take the unconditional jump or pc_br_mux result.
     mux2 #(32) pc_mux(pc_next_br, { pc_plus4[31:28], instr[25:0], 2'b00 },
                             jump, pc_next); 
 
     // Register file logic.
     reg_file rf(clk, reg_write, instr[25:21], instr[20:16],
                 write_reg, res, src_a, write_data);
+    // Determines the write-back location depending on instruction type.
     mux2 #(5) wr_mux(instr[20:16], instr[15:11],
                      reg_dst, write_reg);
+    // Determines if write-back should be alu result or read_data.
     mux2 #(32) res_mux(alu_out, read_data, mem_to_reg, res);
     sign_ext se(instr[15:0], sign_imm);
 
     // ALU logic.
+    // Determines which src to use as second arg to alu.
     mux2 #(32) src_b_mux(write_data, sign_imm, alu_src, src_b);
     alu alu(src_a, src_b, alu_control, alu_out, zero);
 endmodule
