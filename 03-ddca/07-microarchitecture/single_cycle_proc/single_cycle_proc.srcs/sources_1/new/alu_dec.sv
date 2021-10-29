@@ -28,8 +28,8 @@ module alu_dec(
 
     always_comb
         case(alu_op)
-            2'b00: alu_control <= 3'b010; // add (for lw/sw/addi)
-            2'b01: alu_control <= 3'b110; // sub (for beq)
+            2'b00: alu_control <= 4'b0010; // add (for lw/sw/addi)
+            2'b01: alu_control <= 4'b1010; // sub (for beq)
             default: case(funct)
                         6'b000000: alu_control <= 4'b0100; // sll
                         6'b100000: alu_control <= 4'b0010; // add

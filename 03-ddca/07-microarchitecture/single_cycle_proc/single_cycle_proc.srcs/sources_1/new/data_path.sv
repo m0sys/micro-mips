@@ -25,6 +25,8 @@ module data_path(
     input logic         mem_to_reg, pc_src,
     input logic         alu_src, reg_dst,
     input logic         reg_write, jump,
+    input logic         imm_ext_type,
+    input logic         alu_skip,
     input logic [3:0]   alu_control,
     output logic        zero,
     output logic [31:0] pc,
@@ -41,9 +43,11 @@ module data_path(
 
     logic [4:0] write_reg;
     logic [31:0] pc_next, pc_next_br, pc_plus4, pc_branch;
-    logic [31:0] sign_imm, sign_immsh, ext_shamt;
+    logic [31:0] sign_imm, sign_immsh, ext_shamt, upper_imm_ext;
     logic [31:0] src_a, src_b;
+    logic [31:0] ext_sel;
     logic [31:0] src_a_sel;
+    logic [31:0] skip_sel;
     logic [31:0] res;
 
     // Next PC logic.
@@ -57,15 +61,24 @@ module data_path(
     mux2 #(32) pc_mux(pc_next_br, { pc_plus4[31:28], instr[25:0], 2'b00 },
                             jump, pc_next); 
 
+                // reg_write, alu_src, mem_to_reg
+
     // Register file logic.
     reg_file rf(clk, reg_write, instr[25:21], instr[20:16],
                 write_reg, res, src_a, write_data);
     // Determines the write-back location depending on instruction type.
     mux2 #(5) wr_mux(instr[20:16], instr[15:11],
                      reg_dst, write_reg);
-    // Determines if write-back should be alu result or read_data.
-    mux2 #(32) res_mux(alu_out, read_data, mem_to_reg, res);
+    // Determines if write-back should be skip_sel result (alu_out or ext_sel) or read_data.
+    mux2 #(32) res_mux(skip_sel, read_data, mem_to_reg, res);
+
+    // Extension logic.
     sign_ext se(instr[15:0], sign_imm);
+    upper_ext ue(instr[15:0], upper_imm_ext);
+    mux2 #(32) ext_mux(sign_imm, upper_imm_ext, imm_ext_type, ext_sel);
+
+    // Logic for skipping alu and using extended src_b.
+    mux2 #(32) skip_alu_mux(ext_sel, alu_out, alu_skip, skip_sel);
 
     // ALU logic.
     // Determines which src to use as second arg to alu.

@@ -27,6 +27,8 @@ module controller(
     output logic pc_src, alu_src,
     output logic reg_dst, reg_write,
     output logic jump,
+    output logic imm_ext_type,
+    output logic alu_skip,
     output logic [3:0] alu_control
     );
 
