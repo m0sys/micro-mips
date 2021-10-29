@@ -12,6 +12,7 @@ sv xil_defaultlib  \
 "../../../../single_cycle_proc.srcs/sources_1/new/mips.sv" \
 "../../../../single_cycle_proc.srcs/sources_1/new/mux2.sv" \
 "../../../../single_cycle_proc.srcs/sources_1/new/mux4.sv" \
+"../../../../single_cycle_proc.srcs/sources_1/new/mux8.sv" \
 "../../../../single_cycle_proc.srcs/sources_1/new/reg_file.sv" \
 "../../../../single_cycle_proc.srcs/sources_1/new/s12.sv" \
 "../../../../single_cycle_proc.srcs/sources_1/new/sign_ext.sv" \

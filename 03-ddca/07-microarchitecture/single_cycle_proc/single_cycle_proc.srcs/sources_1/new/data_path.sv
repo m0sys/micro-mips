@@ -25,7 +25,7 @@ module data_path(
     input logic         mem_to_reg, pc_src,
     input logic         alu_src, reg_dst,
     input logic         reg_write, jump,
-    input logic [2:0]   alu_control,
+    input logic [3:0]   alu_control,
     output logic        zero,
     output logic [31:0] pc,
     input logic [31:0]  instr,
@@ -41,8 +41,9 @@ module data_path(
 
     logic [4:0] write_reg;
     logic [31:0] pc_next, pc_next_br, pc_plus4, pc_branch;
-    logic [31:0] sign_imm, sign_immsh;
+    logic [31:0] sign_imm, sign_immsh, ext_shamt;
     logic [31:0] src_a, src_b;
+    logic [31:0] src_a_sel;
     logic [31:0] res;
 
     // Next PC logic.
@@ -69,5 +70,8 @@ module data_path(
     // ALU logic.
     // Determines which src to use as second arg to alu.
     mux2 #(32) src_b_mux(write_data, sign_imm, alu_src, src_b);
+    // Determines if src_a should be shamt.
+    mux2 #(32) src_a_mux(ext_shamt, src_a, shamt_src, src_a_sel);
+    sign_ext  se2(instr[10:6], ext_shamt);
     alu alu(src_a, src_b, alu_control, alu_out, zero);
 endmodule

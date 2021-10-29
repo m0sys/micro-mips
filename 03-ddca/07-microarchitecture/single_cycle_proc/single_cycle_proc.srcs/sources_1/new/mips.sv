@@ -32,7 +32,7 @@ module mips(
     logic mem_to_reg, alu_src, reg_dst,
           reg_write, jump, pc_src, zero;
 
-    logic [2:0] alu_control;
+    logic [3:0] alu_control;
 
     controller c(instr[31:26], instr[5:0], zero, 
                  mem_to_reg, mem_write, pc_src,
