@@ -21,28 +21,69 @@
 
 
 module mips(
-    input logic         clk, reset,
-    output logic [31:0] pc,
-    input logic [31:0]  instr,
-    output logic        mem_write,
-    output logic [31:0] alu_out, write_data,
-    input logic [31:0]  read_data
+    // INPUTS
+    input logic          clk_i
+    ,input               reset_i
+    ,input logic  [31:0] instr_i32
+    ,input logic  [31:0] read_data_i32
+
+    // OUTPUTS
+    ,output logic [31:0] pc_o32
+    ,output logic        mem_write_o
+    ,output logic [31:0] alu_out_o32
+    ,output logic [31:0] write_data_o32
     );
 
-    logic mem_to_reg, alu_src, reg_dst,
-          reg_write, jump, pc_src, zero;
-    logic imm_ext_type, alu_skip;
+    logic mem_to_reg_l;
+    logic alu_src_l;
+    logic reg_dst_l;
+    logic reg_write_l; 
+    logic jump_l;
+    logic pc_src_l;
+    logic zero_l;
+    logic imm_ext_type_l;
+    logic alu_skip_l;
+    logic [3:0] alu_control_l4;
 
-    logic [3:0] alu_control;
+    controller c(
+        // INPUTS
+        .op_i6(instr_i32[31:26])
+        ,.funct_i6(instr_i32[5:0])
+        ,.zero_i(zero_l) 
 
-    controller c(instr[31:26], instr[5:0], zero, 
-                 mem_to_reg, mem_write, pc_src,
-                 alu_src, reg_dst, reg_write, jump, imm_ext_type, alu_skip,
-                 alu_control);
+        // OUTPUTS
+        ,.mem_to_reg_o(mem_to_reg_l) 
+        ,.mem_write_o(mem_write_o)
+        ,.pc_src_o(pc_src_l)
+        ,.alu_src_o(alu_src_l)
+        ,.reg_dst_o(reg_dst_l)
+        ,.reg_write_o(reg_write_l)
+        ,.jump_o(jump_l)
+        ,.imm_ext_type_o(imm_ext_type_l)
+        ,.alu_skip_o(alu_skip_l)
+        ,.alu_control_o4(alu_control_l4)
+        );
 
-    data_path dp(clk, reset, mem_to_reg, pc_src,
-                 alu_src, reg_dst, reg_write, jump, imm_ext_type, alu_skip,
-                 alu_control,
-                 zero, pc, instr,
-                 alu_out, write_data, read_data);
+    data_path dp(
+        // INPUTS
+        .clk_i(clk_i)
+        ,.reset_i(reset_i)
+        ,.mem_to_reg_i( mem_to_reg_l)
+        ,.pc_src_i(pc_src_i)
+        ,.alu_src_i(alu_src_l)
+        ,.reg_dst_i(reg_dst_l)
+        ,.reg_write_i(reg_write_l)
+        ,.jump_i(jump_l)
+        ,.imm_ext_type_i(imm_ext_type_l)
+        ,.alu_skip_i(alu_skip_l)
+        ,.alu_control_i4(alu_control_l4)
+        ,.instr_i32(instr_i32)
+        ,.read_data_i32(read_data_i32)
+
+        // OUTPUTS
+        ,.zero_o(zero_l)
+        ,.pc_o32(pc_o32)
+        ,.alu_out_o32(alu_out_o32)
+        ,.write_data_o32(write_data_o32) 
+        );
 endmodule

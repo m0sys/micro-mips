@@ -20,10 +20,10 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module sign_ext(
-    input logic [15:0] a,
+module sign_ext #(parameter WIDTH=8) (
+    input logic [WIDTH-1:0] a,
     output logic [31:0] y
     );
 
-    assign y={ { 16{ a[15] } }, a };
+    assign y={ { (32 - WIDTH) { a[WIDTH-1] } }, a };
 endmodule

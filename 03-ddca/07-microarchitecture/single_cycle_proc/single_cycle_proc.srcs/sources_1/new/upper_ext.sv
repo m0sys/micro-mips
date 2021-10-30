@@ -25,5 +25,5 @@ module upper_ext(
     output logic [31:0] y
     );
 
-    assign y = {a, { 16{ 0 } }};
+    assign y = {a[15:0], { 16{1'b0} }};
 endmodule

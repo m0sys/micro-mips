@@ -25,5 +25,5 @@ module zero_ext(
     output logic [31:0] y
     );
 
-    assign y={ {31{ 0 }}, a};
+    assign y={ {31{ 1'b0 }}, a};
 endmodule

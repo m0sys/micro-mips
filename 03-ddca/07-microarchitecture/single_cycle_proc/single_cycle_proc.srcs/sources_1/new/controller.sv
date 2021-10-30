@@ -21,24 +21,52 @@
 
 
 module controller(
-    input logic [5:0] op, funct,
-    input logic zero,
-    output logic mem_to_reg, mem_write,
-    output logic pc_src, alu_src,
-    output logic reg_dst, reg_write,
-    output logic jump,
-    output logic imm_ext_type,
-    output logic alu_skip,
-    output logic [3:0] alu_control
+    // INPUTS
+    input logic [5:0] op_i6
+    ,input logic [5:0] funct_i6
+    ,input logic zero_i
+    
+    // OUTPUTS
+    ,output logic mem_to_reg_o
+    ,output logic mem_write_o
+    ,output logic pc_src_o
+    ,output logic alu_src_o
+    ,output logic reg_dst_o
+    ,output logic reg_write_o
+    ,output logic jump_o
+    ,output logic imm_ext_type_o
+    ,output logic alu_skip_o
+    ,output logic [3:0] alu_control_o4
     );
 
-    logic [1:0] alu_op;
-    logic branch;
+    logic branch_l;
+    logic [1:0] alu_op_l2;
 
-    main_dec md(op, mem_to_reg, mem_write, branch,
-                alu_src, reg_dst, reg_write, jump, alu_op);
+    main_dec md(
+        // INPUTS
+        .op_i6(op_i6)
 
-    alu_dec ad(funct, alu_op, alu_control);
+        // OUTPUTS
+        ,.mem_to_reg_o(mem_to_reg_o)
+        ,.mem_write_o(mem_write_o)
+        ,.branch_o(branch_l)
+        ,.alu_src_o(alu_src_o)
+        ,.reg_dst_o(reg_dst_o)
+        ,.reg_write_o(reg_write_o) 
+        ,.jump_o(jump_o)
+        ,.imm_ext_type_o(imm_ext_type_o)
+        ,.alu_skip_o(alu_skip_o)
+        ,.alu_op_o2(alu_op_l2)
+        );
 
-    assign pc_src = branch & zero;
+    alu_dec ad(
+        // INPUTS
+        .funct_i6(funct_i6)
+        ,.alu_op_i2(alu_op_l2)
+
+        // OUTPUTS
+        ,.alu_control_o4(alu_control_o4)
+        );
+
+    assign pc_src_o = branch_l & zero_i;
 endmodule
