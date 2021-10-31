@@ -21,18 +21,27 @@
 
 
 module alu(
-    input logic [31:0] a,
-    input logic [31:0] b,
-    input logic [3:0] ctrl,
-    output logic [31:0] y,
-    output logic zero_y
+    // INPUTS
+    input logic [31:0] a_i32
+    ,input logic [31:0] b_i32
+    ,input logic [5:0] funct_i6
+    ,input logic alt_i
+    // input logic [3:0] ctrl,
+    
+    // OUTPUTS
+    ,output logic [31:0] y_o32
+    ,output logic zero_o
     );
+
+    `include "defs/mips_defs.sv"
+
     // 32-bit alu.
     //
     // Define n-bit machine type.
     // TODO: Figure out how to pass constants as parameter in verilog.
     // `define BIT_WIDTH 32
 
+    /*
     logic [32-1:0] b_logical_sel, b_arith_sel, or_res, and_res, 
         zero_res, add_res, shamt_res;
     mux2 #(32) ba_sel(b, ~b, ctrl[3], b_logical_sel);
@@ -43,8 +52,29 @@ module alu(
     assign add_res = a + b_arith_sel;
     assign shamt_res = b_logical_sel << a;
     zero_ext zext(add_res[32-1], zero_res);
+    */
 
+   // TODO: Figure out how to do inverse args.
+    always_comb
+        case(funct_i6)
+            `FUNCT6_ADD: y_o32 <= a_i32 + b_i32;
+            `FUNCT6_SUB: y_o32 <= a_i32 - b_i32;
+            `FUNCT6_AND: y_o32 <= a_i32 & b_i32;
+            `FUNCT6_OR:  y_o32 <= a_i32 | b_i32;
+            `FUNCT6_NOR: y_o32 <= ~(a_i32 | b_i32);
+            `FUNCT6_XOR: y_o32 <= a_i32 ^ b_i32;
+            `FUNCT6_SLT: y_o32 <= a_i32 < b_i32 ? 1 : 0;
+            `FUNCT6_SLL: y_o32 <= a_i32 << b_i32;
+            `FUNCT6_SRL: y_o32 <= a_i32 >> b_i32;
+            default:     y_o32 <= 31'bx;
+
+
+
+
+
+    /*
     mux8 #(32) res_mux(and_res, or_res, add_res, zero_res,
         shamt_res, shamt_res, shamt_res, shamt_res, ctrl[2:0], y);
-    assign zero_y = (y == 0) ? 1 : 0;
+    */
+    assign zero_o = (y_o32 == 32'b0) ? 1 : 0;
 endmodule

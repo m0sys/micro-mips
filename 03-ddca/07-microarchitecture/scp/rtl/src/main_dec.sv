@@ -34,10 +34,12 @@ module main_dec(
     ,output logic       jump_o
     ,output logic       imm_ext_type_o
     ,output logic       alu_skip_o
-    ,output logic [1:0] alu_op_o2
+    // ,output logic [1:0] alu_op_o2
     );
 
-    logic [10:0] controls_l11;
+    `include "defs/mips_defs.sv"
+
+    logic [8:0] controls_l9;
     assign { 
 		reg_write_o
 		,reg_dst_o
@@ -48,18 +50,21 @@ module main_dec(
 		,jump_o
 		,imm_ext_type_o
 		,alu_skip_o
-		,alu_op_o2 
-	} = controls_l11;
+		// ,alu_op_o2 
+	} = controls_l9;
 
     always_comb
         case(op_i6)
-            6'b000000: controls_l11 <= 11'b11000000010; // RTYPE
-            6'b100011: controls_l11 <= 11'b10100100000; // LW
-            6'b001111: controls_l11 <= 11'b10100101100; // LUI
-            6'b101011: controls_l11 <= 11'b00101000000; // SW
-            6'b000100: controls_l11 <= 11'b00010000001; // BEQ
-            6'b001000: controls_l11 <= 11'b10100000000; // ADDI
-            6'b000010: controls_l11 <= 11'b00000010000; // J
-            default:   controls_l11 <= 11'bxxxxxxxxxxx; // illegal op
+            `INSTR_RTYPE: controls_l9 <= 9'b110000000;
+            `INSTR_LW:    controls_l9 <= 9'b101001000; 
+            `INSTR_SW:    controls_l9 <= 9'b001010000;
+            `INSTR_LUI:   controls_l9 <= 9'b101001011;
+            `INSTR_BEQ:   controls_l9 <= 9'b000100000;
+            `INSTR_BNE:   controls_l9 <= 9'bxxxxxxxxx;
+            `INSTR_J:     controls_l9 <= 9'b000000100;
+            `INSTR_JAL:   controls_l9 <= 9'bxxxxxxxxx;
+            `INSTR_ADDI:  controls_l9 <= 9'b101000000; 
+            `INSTR_SLTI:  controls_l9 <= 9'bxxxxxxxxx;
+            default:      controls_l9 <= 9'bxxxxxxxxx; // illegal op
         endcase
 endmodule

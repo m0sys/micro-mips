@@ -23,7 +23,7 @@
 module controller(
     // INPUTS
     input logic [5:0] op_i6
-    ,input logic [5:0] funct_i6
+    // ,input logic [5:0] funct_i6
     ,input logic zero_i
     
     // OUTPUTS
@@ -36,11 +36,11 @@ module controller(
     ,output logic jump_o
     ,output logic imm_ext_type_o
     ,output logic alu_skip_o
-    ,output logic [3:0] alu_control_o4
+    // ,output logic [3:0] alu_control_o4
     );
 
     logic branch_l;
-    logic [1:0] alu_op_l2;
+    // logic [1:0] alu_op_l2;
 
     main_dec md(
         // INPUTS
@@ -56,9 +56,10 @@ module controller(
         ,.jump_o(jump_o)
         ,.imm_ext_type_o(imm_ext_type_o)
         ,.alu_skip_o(alu_skip_o)
-        ,.alu_op_o2(alu_op_l2)
+        // ,.alu_op_o2(alu_op_l2)
         );
 
+    /*
     alu_dec ad(
         // INPUTS
         .funct_i6(funct_i6)
@@ -67,6 +68,7 @@ module controller(
         // OUTPUTS
         ,.alu_control_o4(alu_control_o4)
         );
+        */
 
     assign pc_src_o = branch_l & zero_i;
 endmodule
