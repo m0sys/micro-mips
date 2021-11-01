@@ -31,7 +31,7 @@ module controller(
                                // is saved to reg_file
                                
     ,output logic enable_wmem_o // write enable for dmem
-    ,output logic pc_beq_o    // select for whether to take beq
+    ,output logic pc_branch_o    // select for whether to take beq
 
     ,output logic b_alu_input_o   // select for b input to alu
                               // this selects between ext hardware and reg_file output
@@ -58,13 +58,13 @@ module controller(
         .op_i6(op_i6)
 
         // OUTPUTS
-        ,.mem_to_reg_o(mem_to_reg_o)
-        ,.mem_write_o(mem_write_o)
-        ,.branch_o(branch_l)
-        ,.alu_src_o(alu_src_o)
-        ,.reg_dst_o(reg_dst_o)
-        ,.reg_write_o(reg_write_o) 
-        ,.jump_o(jump_o)
+        ,.alu_wreg_o(alu_wreg_o)
+        ,.enable_wmem_o(enable_wmem_o)
+        ,.branch_o(branch_l) 
+        ,.b_alu_input_o(b_alu_input_o)
+        ,.reg_dst_rtrd_o(reg_dst_rtrd_o)
+        ,.enable_wreg_o(enable_wreg_o) 
+        ,.pc_j_o(pc_j_o)
         // ,.imm_ext_type_o(imm_ext_type_o)
         // ,.alu_skip_o(alu_skip_o)
         ,.alu_alt_cltr_o2(alu_alt_cltr_o2)
@@ -82,5 +82,5 @@ module controller(
         */
 
     // Determine whether to take branch or not (beq).
-    assign pc_src_o = branch_l & zero_i;
+    assign pc_branch_o = branch_l & zero_i;
 endmodule

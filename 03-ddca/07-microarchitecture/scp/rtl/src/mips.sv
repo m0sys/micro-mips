@@ -29,17 +29,17 @@ module mips(
 
     // OUTPUTS
     ,output logic [31:0] pc_o32
-    ,output logic        mem_write_o
+    ,output logic        enable_wmem_o
     ,output logic [31:0] alu_out_o32
     ,output logic [31:0] write_data_o32
     );
 
-    logic mem_to_reg_l;
-    logic alu_src_l;
-    logic reg_dst_l;
-    logic reg_write_l; 
-    logic jump_l;
-    logic pc_src_l;
+    logic alu_wreg_l;
+    logic b_alu_input_l;
+    logic reg_dst_rtrd_l;
+    logic enable_wreg_l; 
+    logic pc_j_l;
+    logic pc_branch_l;
     logic zero_l;
     //logic imm_ext_type_l;
     //logic alu_skip_l;
@@ -49,17 +49,17 @@ module mips(
     controller c(
         // INPUTS
         .op_i6(instr_i32[31:26])
-        ,.funct_i6(instr_i32[5:0])
+        // ,.funct_i6(instr_i32[5:0])
         ,.zero_i(zero_l) 
 
         // OUTPUTS
-        ,.mem_to_reg_o(mem_to_reg_l) 
-        ,.mem_write_o(mem_write_o)
-        ,.pc_src_o(pc_src_l)
-        ,.alu_src_o(alu_src_l)
-        ,.reg_dst_o(reg_dst_l)
-        ,.reg_write_o(reg_write_l)
-        ,.jump_o(jump_l)
+        ,.alu_wreg_o(alu_wreg_l) 
+        ,.enable_wmem_o(enable_wmem_o)
+        ,.pc_branch_o(pc_branch_l)
+        ,.b_alu_input_o(b_alu_input_l)
+        ,.reg_dst_rtrd_o(reg_dst_rtrd_l)
+        ,.enable_wreg_o(enable_wreg_l)
+        ,.pc_j_o(pc_j_l)
         // ,.imm_ext_type_o(imm_ext_type_l)
         // ,.alu_skip_o(alu_skip_l)
         // ,.alu_control_o4(alu_control_l4)
@@ -70,12 +70,12 @@ module mips(
         // INPUTS
         .clk_i(clk_i)
         ,.reset_i(reset_i)
-        ,.mem_to_reg_i( mem_to_reg_l)
-        ,.pc_src_i(pc_src_i)
-        ,.alu_src_i(alu_src_l)
-        ,.reg_dst_i(reg_dst_l)
-        ,.reg_write_i(reg_write_l)
-        ,.jump_i(jump_l)
+        ,.alu_wreg_i(alu_wreg_l)
+        ,.pc_branch_i(pc_branch_l)
+        ,.b_alu_input_i(b_alu_input_l)
+        ,.reg_dst_rtrd_i(reg_dst_rtrd_l)
+        ,.enable_wreg_i(enable_wreg_l)
+        ,.pc_j_i(pc_j_l)
         // ,.imm_ext_type_i(imm_ext_type_l)
         // ,.alu_skip_i(alu_skip_l)
         ,.alu_alt_ctrl_i2(alu_alt_ctrl_o2)

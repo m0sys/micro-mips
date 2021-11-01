@@ -126,6 +126,5 @@ module data_path(
         ,.b_i32(src_b_l32)
         ,.alt_ctrl_i2(alt_ctrl_i2)
         ,.y_o32(alu_out_o32)
-        ,.zero_o(zero_o)
-    );
+        ,.zero_o(zero_o));
 endmodule

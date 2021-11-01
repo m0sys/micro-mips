@@ -25,13 +25,13 @@ module main_dec(
     input logic [5:0]  op_i6
 
     // OUTPUTS
-    ,output logic       mem_to_reg_o
-    ,output logic       mem_write_o
+    ,output logic       alu_wreg_o
+    ,output logic       enable_wmem_o
     ,output logic       branch_o
-    ,output logic       alu_src_o
-    ,output logic       reg_dst_o
-    ,output logic       reg_write_o
-    ,output logic       jump_o
+    ,output logic       b_alu_input_o
+    ,output logic       reg_dst_rtrd_o
+    ,output logic       enable_wreg__o
+    ,output logic       pc_j_o
     //,output logic       imm_ext_type_o
     //,output logic       alu_skip_o
     ,output logic [1:0] alu_alt_cltr_o2
@@ -39,15 +39,15 @@ module main_dec(
 
     `include "defs/mips_defs.sv"
 
-    logic [8:0] controls_l9;
+    logic [8:0] ctrls_l9;
     assign { 
-		reg_write_o
-		,reg_dst_o
-		,alu_src_o
+		enable_wreg_o
+		,reg_dst_rtrd_o
+		,b_alu_input_o
 		,branch_o
-		,mem_write_o
-		,mem_to_reg_o
-		,jump_o
+		,enable_wmem_o
+		,alu_wreg_o
+		,alu_j_o
 		//,imm_ext_type_o
 		//,alu_skip_o
 		,alu_alt_cltr_o2 
@@ -55,16 +55,16 @@ module main_dec(
 
     always_comb
         case(op_i6)
-            `INSTR_RTYPE: controls_l9 <= 9'b110000010;
-            `INSTR_LW:    controls_l9 <= 9'b101001000; 
-            `INSTR_SW:    controls_l9 <= 9'b001010000;
-            `INSTR_LUI:   controls_l9 <= 9'b101001000;
-            `INSTR_BEQ:   controls_l9 <= 9'b000100001;
-            `INSTR_BNE:   controls_l9 <= 9'bxxxxxxxxx;
-            `INSTR_J:     controls_l9 <= 9'b000000100;
-            `INSTR_JAL:   controls_l9 <= 9'bxxxxxxxxx;
-            `INSTR_ADDI:  controls_l9 <= 9'b101000000; 
-            `INSTR_SLTI:  controls_l9 <= 9'bxxxxxxxxx;
-            default:      controls_l9 <= 9'bxxxxxxxxx; // illegal op
+            `INSTR_RTYPE: ctrls_l9 <= 9'b110000010;
+            `INSTR_LW:    ctrls_l9 <= 9'b101001000; 
+            `INSTR_SW:    ctrls_l9 <= 9'b001010000;
+            `INSTR_LUI:   ctrls_l9 <= 9'b101001000;
+            `INSTR_BEQ:   ctrls_l9 <= 9'b000100001;
+            `INSTR_BNE:   ctrls_l9 <= 9'bxxxxxxxxx;
+            `INSTR_J:     ctrls_l9 <= 9'b000000100;
+            `INSTR_JAL:   ctrls_l9 <= 9'bxxxxxxxxx;
+            `INSTR_ADDI:  ctrls_l9 <= 9'b101000000; 
+            `INSTR_SLTI:  ctrls_l9 <= 9'bxxxxxxxxx;
+            default:      ctrls_l9 <= 9'bxxxxxxxxx; // illegal op
         endcase
 endmodule
