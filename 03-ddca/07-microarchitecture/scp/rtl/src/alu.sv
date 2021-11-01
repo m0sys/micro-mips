@@ -26,7 +26,7 @@ module alu(
     ,input logic [31:0] b_i32
     ,input logic [5:0] funct_i6
     // ,input logic alt_i
-    ,input logic [1:0] alt_ctrl_i2,
+    ,input logic [1:0] alt_ctrl_i2
     
     // OUTPUTS
     ,output logic [31:0] y_o32
@@ -57,22 +57,22 @@ module alu(
    // TODO: Figure out how to do inverse args.
     always_comb
         case(funct_i6)
-            `FUNCT6_ADD: y_o32 <= a_i32 + b_i32;
-            `FUNCT6_SUB: y_o32 <= a_i32 - b_i32;
-            `FUNCT6_AND: y_o32 <= a_i32 & b_i32;
-            `FUNCT6_OR:  y_o32 <= a_i32 | b_i32;
-            `FUNCT6_NOR: y_o32 <= ~(a_i32 | b_i32);
-            `FUNCT6_XOR: y_o32 <= a_i32 ^ b_i32;
-            `FUNCT6_SLT: y_o32 <= a_i32 < b_i32 ? 1 : 0;
-            `FUNCT6_SLL: y_o32 <= a_i32 << b_i32;
-            `FUNCT6_SRL: y_o32 <= a_i32 >> b_i32;
-            default: begin
-                case(alt_ctrl_i2)
-                    `ALU_ADD_ALT: y_o32 <= a_i32 + b_i32;
-                    `ALU_SUB_ALT: y_o32 <= a_i32 - b_i32;
-                    default: y_o32 <= 31'bx;
-                end
-            end
+            `FUNCT6_ADD: 	  y_o32 <= a_i32 + b_i32;
+            `FUNCT6_SUB: 	  y_o32 <= a_i32 - b_i32;
+            `FUNCT6_AND: 	  y_o32 <= a_i32 & b_i32;
+            `FUNCT6_OR:  	  y_o32 <= a_i32 | b_i32;
+            `FUNCT6_NOR: 	  y_o32 <= ~(a_i32 | b_i32);
+            `FUNCT6_XOR: 	  y_o32 <= a_i32 ^ b_i32;
+            `FUNCT6_SLT: 	  y_o32 <= a_i32 < b_i32 ? 1 : 0;
+            `FUNCT6_SLL: 	  y_o32 <= a_i32 << b_i32;
+            `FUNCT6_SRL: 	  y_o32 <= a_i32 >> b_i32;
+
+            default: case(alt_ctrl_i2)
+				`ALU_ADD_ALT: y_o32 <= a_i32 + b_i32;
+                `ALU_SUB_ALT: y_o32 <= a_i32 - b_i32;
+                default:      y_o32 <= 31'bx;
+			endcase
+		endcase
 
 
     /*

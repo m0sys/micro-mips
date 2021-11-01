@@ -27,5 +27,5 @@ module sl2(
 
     // Shift a_i32 by 2 to the left (mult by 4).
 
-    assign y={ a[29:0], 2'b00 };
+    assign y_o32={ a_i32[29:0], 2'b00 };
 endmodule

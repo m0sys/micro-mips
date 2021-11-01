@@ -42,16 +42,16 @@ module controller(
                               
     ,output logic enable_wreg_o // write enable for reg_file
     ,output logic pc_j_o      // select for whether to take j (vs beq | pcplus4)
+    ,output logic [1:0] alu_alt_ctrl_o2
     // ,output logic imm_ext_type_o // select between sign_ext or upper_imm_ext
 
     // ,output logic alu_skip_o // select for whether to skip alu and use input b 
                              // extended for write_back
     // ,output logic [3:0] alu_control_o4
-    ,output logic [1:0] alu_alt_cltr_o2
     );
 
     logic branch_l;
-    logic [1:0] alu_op_l2; 
+    // logic [1:0] alu_op_l2; 
 
     main_dec md(
         // INPUTS
@@ -65,9 +65,9 @@ module controller(
         ,.reg_dst_rtrd_o(reg_dst_rtrd_o)
         ,.enable_wreg_o(enable_wreg_o) 
         ,.pc_j_o(pc_j_o)
+        ,.alu_alt_ctrl_o2(alu_alt_ctrl_o2)
         // ,.imm_ext_type_o(imm_ext_type_o)
         // ,.alu_skip_o(alu_skip_o)
-        ,.alu_alt_cltr_o2(alu_alt_cltr_o2)
         );
 
     /*

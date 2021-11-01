@@ -41,10 +41,10 @@ module mips(
     logic pc_j_l;
     logic pc_branch_l;
     logic zero_l;
+    logic [1:0] alu_alt_ctrl_l2; // used for instr s.a beq, addi, lw, sw ,etc..
     //logic imm_ext_type_l;
     //logic alu_skip_l;
     //logic [3:0] alu_control_l4;
-    logic [1:0] alu_alt_ctrl_l2; // used for instr s.a beq, addi, lw, sw ,etc..
 
     controller c(
         // INPUTS
@@ -60,10 +60,10 @@ module mips(
         ,.reg_dst_rtrd_o(reg_dst_rtrd_l)
         ,.enable_wreg_o(enable_wreg_l)
         ,.pc_j_o(pc_j_l)
+        ,.alu_alt_ctrl_o2(alu_alt_ctrl_l2)
         // ,.imm_ext_type_o(imm_ext_type_l)
         // ,.alu_skip_o(alu_skip_l)
         // ,.alu_control_o4(alu_control_l4)
-        ,.alu_alt_ctrl_o2(alu_alt_ctrl_l2)
         );
 
     data_path dp(
@@ -76,11 +76,11 @@ module mips(
         ,.reg_dst_rtrd_i(reg_dst_rtrd_l)
         ,.enable_wreg_i(enable_wreg_l)
         ,.pc_j_i(pc_j_l)
-        // ,.imm_ext_type_i(imm_ext_type_l)
-        // ,.alu_skip_i(alu_skip_l)
-        ,.alu_alt_ctrl_i2(alu_alt_ctrl_o2)
+        ,.alu_alt_ctrl_i2(alu_alt_ctrl_l2)
         ,.instr_i32(instr_i32)
         ,.read_data_i32(read_data_i32)
+        // ,.imm_ext_type_i(imm_ext_type_l)
+        // ,.alu_skip_i(alu_skip_l)
 
         // OUTPUTS
         ,.zero_o(zero_l)

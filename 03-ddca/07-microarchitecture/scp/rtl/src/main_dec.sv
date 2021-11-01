@@ -30,11 +30,11 @@ module main_dec(
     ,output logic       branch_o
     ,output logic       b_alu_input_o
     ,output logic       reg_dst_rtrd_o
-    ,output logic       enable_wreg__o
+    ,output logic       enable_wreg_o
     ,output logic       pc_j_o
+    ,output logic [1:0] alu_alt_ctrl_o2
     //,output logic       imm_ext_type_o
     //,output logic       alu_skip_o
-    ,output logic [1:0] alu_alt_cltr_o2
     );
 
     `include "defs/mips_defs.sv"
@@ -48,10 +48,10 @@ module main_dec(
 		,enable_wmem_o
 		,alu_wreg_o
 		,alu_j_o
+		,alu_alt_ctrl_o2 
 		//,imm_ext_type_o
 		//,alu_skip_o
-		,alu_alt_cltr_o2 
-	} = controls_l7;
+	} = ctrls_l9;
 
     always_comb
         case(op_i6)

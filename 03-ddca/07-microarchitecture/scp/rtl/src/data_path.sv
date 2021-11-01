@@ -30,11 +30,11 @@ module data_path(
     ,input logic        reg_dst_rtrd_i
     ,input logic        enable_wreg_i
     ,input logic        pc_j_i
-    // ,input logic        imm_ext_type_i
-    // ,input logic        alu_skip_i
     ,input logic [1:0]  alu_alt_ctrl_i2
     ,input logic [31:0] instr_i32
     ,input logic [31:0] read_data_i32
+    // ,input logic        imm_ext_type_i
+    // ,input logic        alu_skip_i
 
     // OUTPUTS
     ,output logic zero_o
@@ -70,20 +70,16 @@ module data_path(
         ,.q_o(pc_o32)
     );
     
-    adder pc_incr(
+    adder pc_byte_incr(
         .a_i32(pc_o32)
         ,.b_i32(32'b100) 
         ,.y_o32(pc_plus4_l32) 
     );
 
-    // TODO: Make jump/beq distinction better.
-
-    // Handle jump intr.
+    sign_ext #(16) se(instr_i32[15:0], sign_imm_l32);
     sl2 imm_shift(sign_imm_l32, sign_immsh_l32);
     adder pc_add_shamt(pc_plus4_l32, sign_immsh_l32, pc_branch_l32);
-    // Determines whether to take the target branch or the pcplus4 addr.
     mux2 #(32) pc_beq_mux(pc_plus4_l32, pc_branch_l32, pc_branch_i, pc_next_br_l32);
-    // Determines whether to take the unconditional jump or pc_br_mux result.
     mux2 #(32) pc_j_mux(pc_next_br_l32, { pc_plus4_l32[31:28], instr_i32[25:0], 2'b00 },
                             pc_j_i, pc_next_l32); 
 
@@ -94,18 +90,15 @@ module data_path(
         ,.raddr1_i5(instr_i32[25:21]) 
         ,.raddr2_i5(instr_i32[20:16])
         ,.waddr3_i5(write_reg_l5)
-        ,.wdata_i32(res_l32)
+        ,.wdata3_i32(res_l32)
         ,.rdata1_o32(src_a_l32)
         ,.rdata2_o32(write_data_o32) 
     );
-    // Determines the write-back location depending on instruction type.
-    mux2 #(5) wr_mux(instr_i32[20:16], instr_i32[15:11],
+    mux2 #(5) rd_reg_mux(instr_i32[20:16], instr_i32[15:11],
                      reg_dst_rtrd_i, write_reg_l5);
-    // Determines if write-back should be skip_sel result (alu_out or ext_sel) or read_data.
-    mux2 #(32) res_mux(alu_out_o32, read_data_i32, alu_wreg_i, res_l32);
+    mux2 #(32) wb_reg_mux(alu_out_o32, read_data_i32, alu_wreg_i, res_l32);
 
     // Extension logic.
-    sign_ext #(16) se(inst_i32[15:0], sign_imm_l32);
     //upper_ext ue(instr_i32[15:0], upper_imm_ext_l32);
     //mux2 #(32) ext_mux(sign_imm_l32, upper_imm_ext_l32, imm_ext_type_i, ext_mres_l32);
 
@@ -122,7 +115,7 @@ module data_path(
     alu alu(
         .a_i32(src_a_l32)
         ,.b_i32(src_b_l32)
-        ,.alt_ctrl_i2(alt_ctrl_i2)
+        ,.alt_ctrl_i2(alu_alt_ctrl_i2)
         ,.y_o32(alu_out_o32)
         ,.zero_o(zero_o));
 endmodule

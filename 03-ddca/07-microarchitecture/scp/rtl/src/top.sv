@@ -38,7 +38,7 @@ module top(
 
         // OUTPUTS
         ,.pc_o32(pc)
-        ,.mem_write_o(mem_write)
+        ,.enable_wmem_o(mem_write)
         ,.alu_out_o32(data_adr)
         ,.write_data_o32(write_data)
     );
