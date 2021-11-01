@@ -34,7 +34,7 @@ module mips(
     ,output logic [31:0] write_data_o32
     );
 
-    logic alu_wreg_l;
+    logic mem_to_reg_l;
     logic b_alu_input_l;
     logic reg_dst_rtrd_l;
     logic enable_wreg_l; 
@@ -53,7 +53,7 @@ module mips(
         ,.zero_i(zero_l) 
 
         // OUTPUTS
-        ,.alu_wreg_o(alu_wreg_l) 
+        ,.mem_to_reg_o(mem_to_reg_l) 
         ,.enable_wmem_o(enable_wmem_o)
         ,.pc_branch_o(pc_branch_l)
         ,.b_alu_input_o(b_alu_input_l)
@@ -70,7 +70,7 @@ module mips(
         // INPUTS
         .clk_i(clk_i)
         ,.reset_i(reset_i)
-        ,.alu_wreg_i(alu_wreg_l)
+        ,.mem_to_reg_i(mem_to_reg_l)
         ,.pc_branch_i(pc_branch_l)
         ,.b_alu_input_i(b_alu_input_l)
         ,.reg_dst_rtrd_i(reg_dst_rtrd_l)

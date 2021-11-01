@@ -24,7 +24,7 @@ module data_path(
     // INPUTS
     input logic         clk_i
     ,input logic        reset_i
-    ,input logic        alu_wreg_i
+    ,input logic        mem_to_reg_i
     ,input logic        pc_branch_i
     ,input logic        b_alu_input_i
     ,input logic        reg_dst_rtrd_i
@@ -53,13 +53,13 @@ module data_path(
     logic [31:0] pc_branch_l32;
     logic [31:0] sign_imm_l32;
     logic [31:0] sign_immsh_l32;
-    logic [31:0] ext_shamt_l32;
-    logic [31:0] upper_imm_ext_l32;
+    //logic [31:0] ext_shamt_l32;
+    //logic [31:0] upper_imm_ext_l32;
     logic [31:0] src_a_l32;
     logic [31:0] src_b_l32;
-    logic [31:0] ext_mres_l32;
-    logic [31:0] src_a_mres_l32;
-    logic [31:0] skip_mres_l32;
+    //logic [31:0] ext_mres_l32;
+    //logic [31:0] src_a_mres_l32;
+    //logic [31:0] skip_mres_l32;
     logic [31:0] res_l32;
 
     // Next PC logic.
@@ -76,8 +76,10 @@ module data_path(
         ,.y_o32(pc_plus4_l32) 
     );
 
-    sign_ext #(16) se(instr_i32[15:0], sign_imm_l32);
-    sl2 imm_shift(sign_imm_l32, sign_immsh_l32);
+    sl2 imm_shift(
+        .a_i32(sign_imm_l32)
+        ,.y_o32(sign_immsh_l32)
+    );
     adder pc_add_shamt(pc_plus4_l32, sign_immsh_l32, pc_branch_l32);
     mux2 #(32) pc_beq_mux(pc_plus4_l32, pc_branch_l32, pc_branch_i, pc_next_br_l32);
     mux2 #(32) pc_j_mux(pc_next_br_l32, { pc_plus4_l32[31:28], instr_i32[25:0], 2'b00 },
@@ -96,7 +98,8 @@ module data_path(
     );
     mux2 #(5) rd_reg_mux(instr_i32[20:16], instr_i32[15:11],
                      reg_dst_rtrd_i, write_reg_l5);
-    mux2 #(32) wb_reg_mux(alu_out_o32, read_data_i32, alu_wreg_i, res_l32);
+    mux2 #(32) wb_reg_mux(alu_out_o32, read_data_i32, mem_to_reg_i, res_l32);
+    sign_ext #(16) se(instr_i32[15:0], sign_imm_l32);
 
     // Extension logic.
     //upper_ext ue(instr_i32[15:0], upper_imm_ext_l32);
@@ -115,6 +118,7 @@ module data_path(
     alu alu(
         .a_i32(src_a_l32)
         ,.b_i32(src_b_l32)
+        ,.funct_i6(instr_i32[5:0])
         ,.alt_ctrl_i2(alu_alt_ctrl_i2)
         ,.y_o32(alu_out_o32)
         ,.zero_o(zero_o));

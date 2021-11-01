@@ -50,7 +50,7 @@ module top_tb(
     always @(negedge clk)
     begin
         if (mem_write) begin
-            if (data_adr===84 & write_data===28) begin
+            if (data_adr===84 & write_data===7) begin
                 $display("Simulation succeeded!");
                 $stop;
             end else if (data_adr !== 80) begin

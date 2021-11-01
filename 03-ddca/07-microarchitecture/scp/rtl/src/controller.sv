@@ -27,8 +27,7 @@ module controller(
     ,input logic zero_i
     
     // OUTPUTS
-    ,output logic alu_wreg_o // select for whether alu_out or read_data 
-                               // is saved to reg_file
+    ,output logic mem_to_reg_o // select for whether to move mem to reg
                                
     ,output logic enable_wmem_o // write enable for dmem
     ,output logic pc_branch_o    // select for whether to take beq
@@ -58,7 +57,7 @@ module controller(
         .op_i6(op_i6)
 
         // OUTPUTS
-        ,.alu_wreg_o(alu_wreg_o)
+        ,.mem_to_reg_o(mem_to_reg_o)
         ,.enable_wmem_o(enable_wmem_o)
         ,.branch_o(branch_l) 
         ,.b_alu_input_o(b_alu_input_o)
