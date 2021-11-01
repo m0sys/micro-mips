@@ -32,7 +32,7 @@ module data_path(
     ,input logic        jump_i
     ,input logic        imm_ext_type_i
     ,input logic        alu_skip_i
-    ,input logic [3:0]  alu_control_i4
+    ,input logic [1:0]  alu_alt_ctrl_i2
     ,input logic [31:0] instr_i32
     ,input logic [31:0] read_data_i32
 
@@ -96,7 +96,7 @@ module data_path(
         ,.raddr1_i5(instr_i32[25:21]) 
         ,.raddr2_i5(instr_i32[20:16])
         ,.waddr3_i5(write_reg_l5)
-        ,.write_data_o32(resl32)
+        ,.wdata_i32(res_l32)
         ,.rdata1_o32(src_a_l32)
         ,.rdata2_o32(write_data_o32) 
     );
@@ -121,5 +121,11 @@ module data_path(
     // FIXME: might be a bug someplace in sll wiring.
     //// mux2 #(32) src_a_mux(ext_shamt_l32, src_a_l32, shamt_src, src_a_sel);
     sign_ext #(5)  se2(instr_i32[10:6], ext_shamt_l32);
-    alu alu(src_a_l32, src_b_l32, alu_control_i4, alu_out_o32, zero_o);
+    alu alu(
+        .a_i32(src_a_l32)
+        ,.b_i32(src_b_l32)
+        ,.alt_ctrl_i2(alt_ctrl_i2)
+        ,.y_o32(alu_out_o32)
+        ,.zero_o(zero_o)
+    );
 endmodule

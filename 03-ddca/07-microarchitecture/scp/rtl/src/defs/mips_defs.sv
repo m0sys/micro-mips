@@ -39,4 +39,9 @@
 `define FUNCT6_SLL 6'b000000
 `define FUNCT6_SRL 6'b000010
 
+// ALU Alt Control
+`define ALU_ADD_ALT 2'b00
+`define ALU_SUB_ALT 2'b01
+`define ALU_DIS_ALT 2'b10
+
 

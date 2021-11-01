@@ -27,20 +27,31 @@ module controller(
     ,input logic zero_i
     
     // OUTPUTS
-    ,output logic mem_to_reg_o
-    ,output logic mem_write_o
-    ,output logic pc_src_o
-    ,output logic alu_src_o
-    ,output logic reg_dst_o
-    ,output logic reg_write_o
-    ,output logic jump_o
-    ,output logic imm_ext_type_o
-    ,output logic alu_skip_o
+    ,output logic alu_wreg_o // select for whether alu_out or read_data 
+                               // is saved to reg_file
+                               
+    ,output logic enable_wmem_o // write enable for dmem
+    ,output logic pc_beq_o    // select for whether to take beq
+
+    ,output logic b_alu_input_o   // select for b input to alu
+                              // this selects between ext hardware and reg_file output
+                              
+    ,output logic reg_dst_rtrd_o   // select to determine destination register to
+                              // save the results (instr[20:16] | instr[15:11])
+                              // in reg_file
+                              
+    ,output logic enable_wreg_o // write enable for reg_file
+    ,output logic pc_j_o      // select for whether to take j (vs beq | pcplus4)
+    // ,output logic imm_ext_type_o // select between sign_ext or upper_imm_ext
+
+    // ,output logic alu_skip_o // select for whether to skip alu and use input b 
+                             // extended for write_back
     // ,output logic [3:0] alu_control_o4
+    ,output logic [1:0] alu_alt_cltr_o2
     );
 
     logic branch_l;
-    // logic [1:0] alu_op_l2;
+    logic [1:0] alu_op_l2; 
 
     main_dec md(
         // INPUTS
@@ -54,9 +65,9 @@ module controller(
         ,.reg_dst_o(reg_dst_o)
         ,.reg_write_o(reg_write_o) 
         ,.jump_o(jump_o)
-        ,.imm_ext_type_o(imm_ext_type_o)
-        ,.alu_skip_o(alu_skip_o)
-        // ,.alu_op_o2(alu_op_l2)
+        // ,.imm_ext_type_o(imm_ext_type_o)
+        // ,.alu_skip_o(alu_skip_o)
+        ,.alu_alt_cltr_o2(alu_alt_cltr_o2)
         );
 
     /*

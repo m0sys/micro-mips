@@ -32,9 +32,9 @@ module main_dec(
     ,output logic       reg_dst_o
     ,output logic       reg_write_o
     ,output logic       jump_o
-    ,output logic       imm_ext_type_o
-    ,output logic       alu_skip_o
-    // ,output logic [1:0] alu_op_o2
+    //,output logic       imm_ext_type_o
+    //,output logic       alu_skip_o
+    ,output logic [1:0] alu_alt_cltr_o2
     );
 
     `include "defs/mips_defs.sv"
@@ -48,18 +48,18 @@ module main_dec(
 		,mem_write_o
 		,mem_to_reg_o
 		,jump_o
-		,imm_ext_type_o
-		,alu_skip_o
-		// ,alu_op_o2 
-	} = controls_l9;
+		//,imm_ext_type_o
+		//,alu_skip_o
+		,alu_alt_cltr_o2 
+	} = controls_l7;
 
     always_comb
         case(op_i6)
-            `INSTR_RTYPE: controls_l9 <= 9'b110000000;
+            `INSTR_RTYPE: controls_l9 <= 9'b110000010;
             `INSTR_LW:    controls_l9 <= 9'b101001000; 
             `INSTR_SW:    controls_l9 <= 9'b001010000;
-            `INSTR_LUI:   controls_l9 <= 9'b101001011;
-            `INSTR_BEQ:   controls_l9 <= 9'b000100000;
+            `INSTR_LUI:   controls_l9 <= 9'b101001000;
+            `INSTR_BEQ:   controls_l9 <= 9'b000100001;
             `INSTR_BNE:   controls_l9 <= 9'bxxxxxxxxx;
             `INSTR_J:     controls_l9 <= 9'b000000100;
             `INSTR_JAL:   controls_l9 <= 9'bxxxxxxxxx;
