@@ -21,23 +21,29 @@
 
 
 module reg_file(
-    input logic         clk,
-    input logic         we3,
-    input logic [4:0]   ra1, ra2, wa3, 
-    input logic[31:0]   wd3, // what to save in loc wa3
-    output logic [31:0] rd1, rd2
+    // INPUTS
+    input logic         clk_i
+    ,input logic        we3_i
+    ,input logic [4:0]  raddr1_i5
+    ,input logic [4:0]  raddr2_i5
+    ,input logic [4:0]  waddr3_i5
+    ,input logic [31:0] wdata3_i32 // what to save in loc wa3
+
+    // OUTPUTS
+    ,output logic [31:0] rdata1_o32
+    ,output logic [31:0] rdata2_o32
     );
 
-    logic [31:0] rf[31:0];
+    logic [31:0] rf_l32x32[31:0];
 
     // Three ported register file. Read two ports combinationally.
     // Write third port on rising edge of clk. Register 0 is hardwired to 0.
     // NOTE: for piplined processor, write third port on falling edge of clk.
     
-    always_ff @(posedge clk)
-        if (we3) rf[wa3] <= wd3;
+    always_ff @(posedge clk_i)
+        if (we3_i) rf_l32x32[waddr3_i5] <= wdata3_i32;
 
-    assign rd1 = (ra1 != 0) ? rf[ra1] : 0;
-    assign rd2 = (ra2 != 0) ? rf[ra2] : 0;
+    assign rdata1_o32 = (raddr1_i5 != 0) ? rf_l32x32[raddr1_i5] : 0;
+    assign rdata2_o32 = (raddr2_i5 != 0) ? rf_l32x32[raddr2_i5] : 0;
 
 endmodule

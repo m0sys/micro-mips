@@ -43,9 +43,6 @@ module data_path(
     ,output logic [31:0] write_data_o32
     );
 
-    // Define n-bit machine type.
-    // `define BIT_WIDTH 32
-
     // NOTE: I'm not fond of comments when possible to avoid - but
     //       this language's expressiveness sucks. 
 
@@ -66,21 +63,43 @@ module data_path(
     logic [31:0] res_l32;
 
     // Next PC logic.
-    flopr #(32) pc_reg(clk_i, reset_i, pc_next_l32, pc_o32);
-    adder pc_add1(pc_o32, 32'b100, pc_plus4_l32); // byte incr pc adder
-    s12 immsh(sign_imm_l32, sign_immsh_l32);
-    adder pc_add2(pc_plus4_l32, sign_immsh_l32, pc_branch_l32); // branch pc adder
+    flopr #(32) pc_reg(
+        .clk_i(clk_i)
+        ,.reset_i(reset_i)
+        ,.d_i(pc_next_l32)
+        ,.q_o(pc_o32)
+    );
+    
+    adder pc_incr(
+        .a_i32(pc_o32)
+        ,.b_i32(32'b100) 
+        ,.y_o32(pc_plus4_l32) 
+    );
+
+    // TODO: Make jump/beq distinction better.
+
+    // Handle jump intr.
+    sl2 imm_shift(sign_imm_l32, sign_immsh_l32);
+    adder pc_add_shamt(pc_plus4_l32, sign_immsh_l32, pc_branch_l32);
     // Determines whether to take the target branch or the pcplus4 addr.
-    mux2 #(32) pc_br_mux(pc_plus4_l32, pc_branch_l32, pc_src_i, pc_next_br_l32);
+    mux2 #(32) pc_beq_mux(pc_plus4_l32, pc_branch_l32, pc_src_i, pc_next_br_l32);
     // Determines whether to take the unconditional jump or pc_br_mux result.
-    mux2 #(32) pc_mux(pc_next_br_l32, { pc_plus4_l32[31:28], instr_i32[25:0], 2'b00 },
+    mux2 #(32) pc_j_mux(pc_next_br_l32, { pc_plus4_l32[31:28], instr_i32[25:0], 2'b00 },
                             jump_i, pc_next_l32); 
 
                 // reg_write, alu_src, mem_to_reg
 
     // Register file logic.
-    reg_file rf(clk_i, reg_write_i, instr_i32[25:21], instr_i32[20:16],
-                write_reg_l5, resl32, src_a_l32, write_data_o32);
+    reg_file rf(
+        .clk_i(clk_i)
+        ,.we3_i(reg_write_i)
+        ,.raddr1_i5(instr_i32[25:21]) 
+        ,.raddr2_i5(instr_i32[20:16])
+        ,.waddr3_i5(write_reg_l5)
+        ,.write_data_o32(resl32)
+        ,.rdata1_o32(src_a_l32)
+        ,.rdata2_o32(write_data_o32) 
+    );
     // Determines the write-back location depending on instruction type.
     mux2 #(5) wr_mux(instr_i32[20:16], instr_i32[15:11],
                      reg_dst_i, write_reg_l5);

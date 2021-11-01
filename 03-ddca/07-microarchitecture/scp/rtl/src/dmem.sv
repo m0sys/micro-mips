@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 10/28/2021 10:37:58 AM
+// Create Date: 10/28/2021 10:41:10 AM
 // Design Name: 
-// Module Name: top
+// Module Name: dmem
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,16 +20,17 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module top(
-    input logic clk, reset,
-    output logic [31:0] write_data, data_adr,
-    output logic mem_write
+module dmem(
+    input logic clk_i
+    ,input logic we_i
+    ,input logic [31:0] addr_i32
+    ,input logic [31:0] wdata_i32
+    ,output logic [31:0] rdata_o32
     );
 
-    logic [31:0] pc, instr, read_data;
-
-    // Init processor and mems.
-    mips mips(clk, reset, pc, instr, mem_write, data_adr, write_data, read_data);
-    imem imem(pc[7:2], instr);
-    dmem dmem(clk, mem_write, data_adr, write_data, read_data);
+    logic [31:0] RAM[63:0];
+    assign rdata_o32=RAM[addr_i32[31:2]]; // word aligned
+    
+    always_ff @(posedge clk_i)
+        if (we_i) RAM[addr_i32[31:2]] <= wdata_i32;
 endmodule

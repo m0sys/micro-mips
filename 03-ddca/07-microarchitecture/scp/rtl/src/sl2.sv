@@ -20,11 +20,12 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module s12(
-    input logic [31:0] a,
-    output logic [31:0] y
+module sl2(
+    input logic [31:0] a_i32,
+    output logic [31:0] y_o32
     );
 
-    // Shift left by 2.
+    // Shift a_i32 by 2 to the left (mult by 4).
+
     assign y={ a[29:0], 2'b00 };
 endmodule

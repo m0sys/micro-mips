@@ -21,9 +21,13 @@
 
 
 module adder(
-    input logic [31:0] a, b,
-    output logic [31:0] y
+    // INPUTS
+    input logic [31:0] a_i32
+    ,input logic [31:0] b_i32
+
+    // OUTPUTS
+    ,output logic [31:0] y_o32
     );
 
-    assign y=a+b;
+    assign y_o32=a_i32+b_i32;
 endmodule

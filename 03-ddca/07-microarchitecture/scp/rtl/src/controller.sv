@@ -70,5 +70,6 @@ module controller(
         );
         */
 
+    // Determine whether to take branch or not (beq).
     assign pc_src_o = branch_l & zero_i;
 endmodule
