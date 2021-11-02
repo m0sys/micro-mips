@@ -31,24 +31,6 @@ module alu(
 
 	`include "defs/mips_defs.sv"
 
-    // 32-bit alu.
-    //
-    // Define n-bit machine type.
-    // TODO: Figure out how to pass constants as parameter in verilog.
-    // `define BIT_WIDTH 32
-
-	/*
-    logic [32-1:0] b_logical_sel, b_arith_sel, or_res, and_res, zero_res, add_res;
-    mux2 #(32) ba_sel(b, ~b, ctrl[2], b_logical_sel);
-    mux2 #(32) bl_sel(b, -b, ctrl[2], b_arith_sel);
-
-    assign or_res=a|b_logical_sel;
-    assign and_res=a&b_logical_sel; 
-    assign add_res=a+b_arith_sel;
-    zero_ext zext(add_res[32-1], zero_res);
-
-    mux4 #(32) res_mux(and_res, or_res, add_res, zero_res, ctrl[1:0], y);
-	*/
    	// TODO: Figure out how to do inverse args.
     always_comb
         case(funct_i6)
@@ -68,11 +50,7 @@ module alu(
                 default:      y_o32 <= 31'bx;
 			endcase
 		endcase
-
-
-
    
-
     assign zero_o = (y_o32 == 32'b0) ? 1 : 0;
 
 endmodule

@@ -45,7 +45,7 @@ module data_path(
     // Next PC logic.
     flopr #(32) pc_reg(clk, reset, pc_next, pc);
     adder pc_add1(pc, 32'b100, pc_plus4);
-    s12 immsh(sign_imm, sign_immsh);
+    sl2 immsh(sign_imm, sign_immsh);
     adder pc_add2(pc_plus4, sign_immsh, pc_branch);
     mux2 #(32) pc_br_mux(pc_plus4, pc_branch, pc_src, pc_next_br);
     mux2 #(32) pc_mux(pc_next_br, { pc_plus4[31:28], instr[25:0], 2'b00 },

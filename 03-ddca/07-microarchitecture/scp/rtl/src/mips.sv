@@ -21,27 +21,46 @@
 
 
 module mips(
-    input logic         clk, reset,
-    output logic [31:0] pc,
-    input logic [31:0]  instr,
-    output logic        mem_write,
-    output logic [31:0] alu_out, write_data,
-    input logic [31:0]  read_data
+    // INPUTS
+    input logic         clk_i
+    ,input logic reset_i
+    ,input logic [31:0]  instr_i32
+    ,input logic [31:0]  read_data_i32
+
+    // OUTPUTS
+    ,output logic [31:0] pc_o32
+    ,output logic        enable_wmem_o
+    ,output logic [31:0] alu_out_o32
+    ,output logic [31:0] write_data_o32
     );
 
-    logic mem_to_reg, alu_src, reg_dst,
-          reg_write, jump, pc_src, zero;
+    logic mem_to_reg_l;
+    logic b_alu_input_l;
+    logic reg_dst_rtrd_l;
+    logic enable_wreg_l;
+    logic pc_j_l;
+    logic pc_branch_l;
+    logic zero_l;
 
     logic [1:0] alu_alt_ctrl_l2;
 
-    controller c(instr[31:26], zero, 
-                 mem_to_reg, mem_write, pc_src,
-                 alu_src, reg_dst, reg_write, jump,
-                 alu_alt_ctrl_l2);
+    controller c(
+        .op_i6(instr_i32[31:26])
+        ,.zero_i(zero_l)
 
-    data_path dp(clk, reset, mem_to_reg, pc_src,
-                 alu_src, reg_dst, reg_write, jump,
+        ,.mem_to_reg_o(mem_to_reg_l)
+        ,.enable_wmem_o(enable_wmem_o)
+        ,.pc_branch_o(pc_branch_l)
+        ,.b_alu_input_o(b_alu_input_l)
+        ,.reg_dst_rtrd_o(reg_dst_rtrd_l)
+        ,.enable_wreg_o(enable_wreg_l)
+        ,.pc_j_o(pc_j_l)
+        ,.alu_alt_ctrl_o2(alu_alt_ctrl_l2)
+    );
+
+    data_path dp(clk_i, reset_i, mem_to_reg_l, pc_branch_l,
+                 b_alu_input_l, reg_dst_rtrd_l, enable_wreg_l, pc_j_l,
                  alu_alt_ctrl_l2,
-                 zero, pc, instr,
-                 alu_out, write_data, read_data);
+                 zero_l, pc_o32, instr_i32,
+                 alu_out_o32, write_data_o32, read_data_i32);
 endmodule
