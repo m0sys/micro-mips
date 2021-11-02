@@ -21,22 +21,22 @@
 
 
 module controller(
-    input logic [5:0] op, funct,
+    input logic [5:0] op, //funct,
     input logic zero,
     output logic mem_to_reg, mem_write,
     output logic pc_src, alu_src,
     output logic reg_dst, reg_write,
     output logic jump,
-    output logic [2:0] alu_control
+    output logic [1:0] alu_alt_ctrl_o2
     );
 
-    logic [1:0] alu_op;
+    //logic [1:0] alu_op;
     logic branch;
 
     main_dec md(op, mem_to_reg, mem_write, branch,
-                alu_src, reg_dst, reg_write, jump, alu_op);
+                alu_src, reg_dst, reg_write, jump, alu_alt_ctrl_o2);
 
-    alu_dec ad(funct, alu_op, alu_control);
+    // alu_dec ad(funct, alu_op, alu_control);
 
     assign pc_src = branch & zero;
 endmodule

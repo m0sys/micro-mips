@@ -25,7 +25,7 @@ module data_path(
     input logic         mem_to_reg, pc_src,
     input logic         alu_src, reg_dst,
     input logic         reg_write, jump,
-    input logic [2:0]   alu_control,
+    input logic [1:0]   alu_control,
     output logic        zero,
     output logic [31:0] pc,
     input logic [31:0]  instr,
@@ -61,5 +61,5 @@ module data_path(
 
     // ALU logic.
     mux2 #(32) src_b_mux(write_data, sign_imm, alu_src, src_b);
-    alu alu(src_a, src_b, alu_control, alu_out, zero);
+    alu alu(src_a, src_b, instr[5:0], alu_control, alu_out, zero);
 endmodule

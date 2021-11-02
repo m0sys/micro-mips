@@ -32,16 +32,16 @@ module mips(
     logic mem_to_reg, alu_src, reg_dst,
           reg_write, jump, pc_src, zero;
 
-    logic [2:0] alu_control;
+    logic [1:0] alu_alt_ctrl_l2;
 
-    controller c(instr[31:26], instr[5:0], zero, 
+    controller c(instr[31:26], zero, 
                  mem_to_reg, mem_write, pc_src,
                  alu_src, reg_dst, reg_write, jump,
-                 alu_control);
+                 alu_alt_ctrl_l2);
 
     data_path dp(clk, reset, mem_to_reg, pc_src,
                  alu_src, reg_dst, reg_write, jump,
-                 alu_control,
+                 alu_alt_ctrl_l2,
                  zero, pc, instr,
                  alu_out, write_data, read_data);
 endmodule
