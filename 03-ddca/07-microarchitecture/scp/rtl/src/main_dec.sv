@@ -5,6 +5,7 @@
 module main_dec(
     // INPUTS
     input logic [5:0]  op_i6
+    ,input logic [5:0]  funct_i6
 
     // OUTPUTS
     ,output logic       mem_to_reg_o
@@ -14,6 +15,7 @@ module main_dec(
     ,output logic       reg_dst_rtrd_o
     ,output logic       enable_wreg_o
     ,output logic       pc_j_o
+    ,output logic       apply_shift_o
     ,output logic [1:0] alu_alt_ctrl_o2
     );
 
@@ -31,6 +33,19 @@ module main_dec(
         ,alu_alt_ctrl_o2
     } = ctrls_l9;
 
+    // assign apply_shift_o = funct_i6 == |{ `FUNCT6_SLL, `FUNCT6_SRL } ? 1 : 0;
+    // always_comb
+    //     case(funct_i6)
+    //         |{ `FUNCT6_SLL, `FUNCT6_SRL }: apply_shift_o <= 1;
+    //         default:                       apply_shift_o <= 0;
+    //     endcase
+
+    always_comb
+        if (funct_i6 == `FUNCT6_SLL || funct_i6 == `FUNCT6_SRL)
+            apply_shift_o <= 1;
+        else
+            apply_shift_o <= 0;
+
     always_comb
         case(op_i6)
             `INSTR_RTYPE: ctrls_l9 <= 9'b110000010;
@@ -45,4 +60,5 @@ module main_dec(
             //`INSTR_SLTI:  ctrls_l9 <= 9'bxxxxxxxxx;
             default:      ctrls_l9 <= 9'bxxxxxxxxx; // illegal op
         endcase
+        
 endmodule

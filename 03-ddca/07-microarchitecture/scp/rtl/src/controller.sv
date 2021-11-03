@@ -5,6 +5,7 @@
 module controller(
     // INPUTS
     input logic [5:0] op_i6
+    ,input logic [5:0] funct_i6
     ,input logic zero_i
 
     // OUTPUTS
@@ -15,6 +16,7 @@ module controller(
     ,output logic reg_dst_rtrd_o
     ,output logic enable_wreg_o
     ,output logic pc_j_o
+    ,output logic apply_shift_o
     ,output logic [1:0] alu_alt_ctrl_o2
     );
 
@@ -22,6 +24,7 @@ module controller(
 
     main_dec md(
         .op_i6(op_i6)
+        ,.funct_i6(funct_i6)
         ,.mem_to_reg_o(mem_to_reg_o)
         ,.enable_wmem_o(enable_wmem_o)
         ,.branch_o(branch_l)
@@ -29,6 +32,7 @@ module controller(
         ,.reg_dst_rtrd_o(reg_dst_rtrd_o)
         ,.enable_wreg_o(enable_wreg_o)
         ,.pc_j_o(pc_j_o)
+        ,.apply_shift_o(apply_shift_o)
         ,.alu_alt_ctrl_o2(alu_alt_ctrl_o2)
     );
 
