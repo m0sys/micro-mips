@@ -33,7 +33,18 @@ module main_dec(
         ,alu_alt_ctrl_o2
     } = ctrls_l9;
 
-    assign apply_shift_o = funct_i6 == |{ `FUNCT6_SLL, `FUNCT6_SRL } ? 1 : 0;
+    // assign apply_shift_o = funct_i6 == |{ `FUNCT6_SLL, `FUNCT6_SRL } ? 1 : 0;
+    // always_comb
+    //     case(funct_i6)
+    //         |{ `FUNCT6_SLL, `FUNCT6_SRL }: apply_shift_o <= 1;
+    //         default:                       apply_shift_o <= 0;
+    //     endcase
+
+    always_comb
+        if (funct_i6 == `FUNCT6_SLL || funct_i6 == `FUNCT6_SRL)
+            apply_shift_o <= 1;
+        else
+            apply_shift_o <= 0;
 
     always_comb
         case(op_i6)
