@@ -1,23 +1,5 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
 // Create Date: 10/28/2021 07:29:48 AM
-// Design Name: 
-// Module Name: mips
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 
 
 module mips(
@@ -58,9 +40,22 @@ module mips(
         ,.alu_alt_ctrl_o2(alu_alt_ctrl_l2)
     );
 
-    data_path dp(clk_i, reset_i, mem_to_reg_l, pc_branch_l,
-                 b_alu_input_l, reg_dst_rtrd_l, enable_wreg_l, pc_j_l,
-                 alu_alt_ctrl_l2,
-                 zero_l, pc_o32, instr_i32,
-                 alu_out_o32, write_data_o32, read_data_i32);
+    data_path dp(
+        .clk_i(clk_i)
+        ,.reset_i(reset_i)
+        ,.mem_to_reg_i(mem_to_reg_l)
+        ,.pc_branch_i(pc_branch_l)
+        ,.b_alu_input_i(b_alu_input_l)
+        ,.reg_dst_rtrd_i(reg_dst_rtrd_l)
+        ,.enable_wreg_i(enable_wreg_l)
+        ,.pc_j_i(pc_j_l)
+        ,.alu_alt_ctrl_i2(alu_alt_ctrl_l2)
+        ,.instr_i32(instr_i32)
+        ,.read_data_i32(read_data_i32)
+
+        ,.pc_o32(pc_o32)
+        ,.alu_out_o32(alu_out_o32)
+        ,.zero_o(zero_l)
+        ,.write_data_o32(write_data_o32)
+    );
 endmodule
