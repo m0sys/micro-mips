@@ -22,6 +22,8 @@
 // 00073880 => sll $7, $7, 2
 // 08000012 => j 0x12 (jump by 12*bytes)
 // 20020001 => j 0x11 (original jump)
+// 00E53822 => sub $7, $7, $5
+// 00073882 => rl $7, $7, 2
 
 module top_tb(
     );
@@ -51,7 +53,7 @@ module top_tb(
     always @(negedge clk)
     begin
         if (mem_write) begin
-            if (data_adr===84 & write_data===28) begin
+            if (data_adr===84 & write_data===4) begin
                 $display("Simulation succeeded! data_adr=%d , write_data=%d", data_adr, write_data);
                 $stop;
             end else if (data_adr !== 80) begin

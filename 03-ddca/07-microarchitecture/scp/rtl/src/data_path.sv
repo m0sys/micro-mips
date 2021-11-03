@@ -94,6 +94,24 @@ module data_path(
             $display("dst_reg_addr_l5 ", dst_reg_addr_l5);
         end
 
+        else if (instr_i32[5:0] == `FUNCT6_SRL && instr_i32[31:26] == `INSTR_RTYPE)
+        begin
+            $display("INSTR_SRL");
+            $display("src_a_l32 value: ", src_a_l32);
+            $display("src_a_l32 value binary: %b", src_a_l32);
+            $display("src_b_l32 value: ", src_b_l32);
+            $display("src_b_l32 value: binary: %b", src_b_l32);
+            $display("se_shamt_l32: ", se_shamt_l32);
+            $display("alu_out_o32: ", alu_out_o32);
+            $display("res_l32: ", res_l32);
+            $display("res_l32: binary: %b", res_l32);
+            $display("write_data_o32: ", write_data_o32);
+            $display("write_data_o32: binary: %b", write_data_o32);
+            $display("apply_shift_i: ", apply_shift_i);
+            $display("enable_wreg_i: ", enable_wreg_i);
+            $display("dst_reg_addr_l5 ", dst_reg_addr_l5);
+        end
+
         else if (instr_i32[31:26] == `INSTR_SW)
         begin
             $display("INSTR_SW");
