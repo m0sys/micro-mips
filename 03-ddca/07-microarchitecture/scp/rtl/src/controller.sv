@@ -1,42 +1,36 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
 // Create Date: 10/28/2021 07:38:37 AM
-// Design Name: 
-// Module Name: controller
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 
 
 module controller(
-    input logic [5:0] op, funct,
-    input logic zero,
-    output logic mem_to_reg, mem_write,
-    output logic pc_src, alu_src,
-    output logic reg_dst, reg_write,
-    output logic jump,
-    output logic [2:0] alu_control
+    // INPUTS
+    input logic [5:0] op_i6
+    ,input logic zero_i
+
+    // OUTPUTS
+    ,output logic mem_to_reg_o
+    ,output logic enable_wmem_o
+    ,output logic pc_branch_o
+    ,output logic b_alu_input_o
+    ,output logic reg_dst_rtrd_o
+    ,output logic enable_wreg_o
+    ,output logic pc_j_o
+    ,output logic [1:0] alu_alt_ctrl_o2
     );
 
-    logic [1:0] alu_op;
-    logic branch;
+    logic branch_l;
 
-    main_dec md(op, mem_to_reg, mem_write, branch,
-                alu_src, reg_dst, reg_write, jump, alu_op);
+    main_dec md(
+        .op_i6(op_i6)
+        ,.mem_to_reg_o(mem_to_reg_o)
+        ,.enable_wmem_o(enable_wmem_o)
+        ,.branch_o(branch_l)
+        ,.b_alu_input_o(b_alu_input_o)
+        ,.reg_dst_rtrd_o(reg_dst_rtrd_o)
+        ,.enable_wreg_o(enable_wreg_o)
+        ,.pc_j_o(pc_j_o)
+        ,.alu_alt_ctrl_o2(alu_alt_ctrl_o2)
+    );
 
-    alu_dec ad(funct, alu_op, alu_control);
-
-    assign pc_src = branch & zero;
+    assign pc_branch_o = branch_l & zero_i;
 endmodule

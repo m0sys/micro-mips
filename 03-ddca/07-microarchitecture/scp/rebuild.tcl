@@ -32,9 +32,9 @@
 #    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/src/alu_dec.sv"
 #    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/src/controller.sv"
 #    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/src/data_path.sv"
-#    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/test/dmem.sv"
+#    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/src/dmem.sv"
 #    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/src/flopr.sv"
-#    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/test/imem.sv"
+#    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/src/imem.sv"
 #    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/src/main_dec.sv"
 #    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/src/mips.sv"
 #    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/src/mux2.sv"
@@ -43,7 +43,7 @@
 #    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/src/s12.sv"
 #    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/src/sign_ext.sv"
 #    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/src/zero_ext.sv"
-#    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/test/top.sv"
+#    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/src/top.sv"
 #    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/test/memfile.dat"
 #    "/home/mo/Desktop/Github/ce-road-to-mastery/03-ddca/07-microarchitecture/scp/rtl/test/top_tb.sv"
 #
@@ -58,9 +58,9 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/rtl/src/alu_dec.sv"]"\
  "[file normalize "$origin_dir/rtl/src/controller.sv"]"\
  "[file normalize "$origin_dir/rtl/src/data_path.sv"]"\
- "[file normalize "$origin_dir/rtl/test/dmem.sv"]"\
+ "[file normalize "$origin_dir/rtl/src/dmem.sv"]"\
  "[file normalize "$origin_dir/rtl/src/flopr.sv"]"\
- "[file normalize "$origin_dir/rtl/test/imem.sv"]"\
+ "[file normalize "$origin_dir/rtl/src/imem.sv"]"\
  "[file normalize "$origin_dir/rtl/src/main_dec.sv"]"\
  "[file normalize "$origin_dir/rtl/src/mips.sv"]"\
  "[file normalize "$origin_dir/rtl/src/mux2.sv"]"\
@@ -69,7 +69,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/rtl/src/s12.sv"]"\
  "[file normalize "$origin_dir/rtl/src/sign_ext.sv"]"\
  "[file normalize "$origin_dir/rtl/src/zero_ext.sv"]"\
- "[file normalize "$origin_dir/rtl/test/top.sv"]"\
+ "[file normalize "$origin_dir/rtl/src/top.sv"]"\
  "[file normalize "$origin_dir/rtl/test/memfile.dat"]"\
  "[file normalize "$origin_dir/rtl/test/top_tb.sv"]"\
   ]
@@ -193,9 +193,9 @@ set files [list \
  [file normalize "${origin_dir}/rtl/src/alu_dec.sv"] \
  [file normalize "${origin_dir}/rtl/src/controller.sv"] \
  [file normalize "${origin_dir}/rtl/src/data_path.sv"] \
- [file normalize "${origin_dir}/rtl/test/dmem.sv"] \
+ [file normalize "${origin_dir}/rtl/src/dmem.sv"] \
  [file normalize "${origin_dir}/rtl/src/flopr.sv"] \
- [file normalize "${origin_dir}/rtl/test/imem.sv"] \
+ [file normalize "${origin_dir}/rtl/src/imem.sv"] \
  [file normalize "${origin_dir}/rtl/src/main_dec.sv"] \
  [file normalize "${origin_dir}/rtl/src/mips.sv"] \
  [file normalize "${origin_dir}/rtl/src/mux2.sv"] \
@@ -204,7 +204,7 @@ set files [list \
  [file normalize "${origin_dir}/rtl/src/s12.sv"] \
  [file normalize "${origin_dir}/rtl/src/sign_ext.sv"] \
  [file normalize "${origin_dir}/rtl/src/zero_ext.sv"] \
- [file normalize "${origin_dir}/rtl/test/top.sv"] \
+ [file normalize "${origin_dir}/rtl/src/top.sv"] \
  [file normalize "${origin_dir}/rtl/test/memfile.dat"] \
 ]
 add_files -norecurse -fileset $obj $files
@@ -235,7 +235,7 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-set file "$origin_dir/rtl/test/dmem.sv"
+set file "$origin_dir/rtl/src/dmem.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
@@ -245,7 +245,7 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-set file "$origin_dir/rtl/test/imem.sv"
+set file "$origin_dir/rtl/src/imem.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
@@ -290,7 +290,7 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-set file "$origin_dir/rtl/test/top.sv"
+set file "$origin_dir/rtl/src/top.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj

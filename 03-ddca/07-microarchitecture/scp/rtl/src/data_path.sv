@@ -1,65 +1,64 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
 // Create Date: 10/28/2021 08:03:15 AM
-// Design Name: 
-// Module Name: data_path
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 
 
 module data_path(
-    input logic         clk, reset,
-    input logic         mem_to_reg, pc_src,
-    input logic         alu_src, reg_dst,
-    input logic         reg_write, jump,
-    input logic [2:0]   alu_control,
-    output logic        zero,
-    output logic [31:0] pc,
-    input logic [31:0]  instr,
-    output logic [31:0] alu_out, write_data,
-    input logic [31:0]  read_data
+    // INPUTS
+    input logic         clk_i
+    ,input logic        reset_i
+    ,input logic        mem_to_reg_i
+    ,input logic        pc_branch_i
+    ,input logic        b_alu_input_i
+    ,input logic        reg_dst_rtrd_i
+    ,input logic        enable_wreg_i
+    ,input logic        pc_j_i
+    ,input logic [1:0]  alu_alt_ctrl_i2
+    ,input logic [31:0]  instr_i32
+    ,input logic [31:0]  read_data_i32
+
+    // OUTPUTS
+    ,output logic [31:0] pc_o32
+    ,output logic [31:0] alu_out_o32
+    ,output logic        zero_o
+    ,output logic [31:0] write_data_o32
     );
 
-    // Define n-bit machine type.
-    // `define BIT_WIDTH 32
-
-    logic [4:0] write_reg;
-    logic [31:0] pc_next, pc_next_br, pc_plus4, pc_branch;
-    logic [31:0] sign_imm, sign_immsh;
-    logic [31:0] src_a, src_b;
-    logic [31:0] res;
+    logic [4:0] write_reg_l5;
+    logic [31:0] pc_next_l32;
+    logic [31:0] pc_next_br_l32;
+    logic [31:0] pc_plus4_l32;
+    logic [31:0] pc_branch_l32;
+    logic [31:0] sign_imm_l32;
+    logic [31:0] sign_immsh_l32;
+    logic [31:0] src_a_l32;
+    logic [31:0] src_b_l32;
+    logic [31:0] res_l32;
 
     // Next PC logic.
-    flopr #(32) pc_reg(clk, reset, pc_next, pc);
-    adder pc_add1(pc, 32'b100, pc_plus4);
-    s12 immsh(sign_imm, sign_immsh);
-    adder pc_add2(pc_plus4, sign_immsh, pc_branch);
-    mux2 #(32) pc_br_mux(pc_plus4, pc_branch, pc_src, pc_next_br);
-    mux2 #(32) pc_mux(pc_next_br, { pc_plus4[31:28], instr[25:0], 2'b00 },
-                            jump, pc_next); 
+    flopr #(32) pc_reg(clk_i, reset_i, pc_next_l32, pc_o32);
+    adder pc_add1(pc_o32, 32'b100, pc_plus4_l32);
+    sl2 immsh(sign_imm_l32, sign_immsh_l32);
+    adder pc_add2(pc_plus4_l32, sign_immsh_l32, pc_branch_l32);
+    mux2 #(32) pc_br_mux(pc_plus4_l32, pc_branch_l32, pc_branch_i, pc_next_br_l32);
+    mux2 #(32) pc_mux(pc_next_br_l32, { pc_plus4_l32[31:28], instr_i32[25:0], 2'b00 },
+                            pc_j_i, pc_next_l32); 
 
     // Register file logic.
-    reg_file rf(clk, reg_write, instr[25:21], instr[20:16],
-                write_reg, res, src_a, write_data);
-    mux2 #(5) wr_mux(instr[20:16], instr[15:11],
-                     reg_dst, write_reg);
-    mux2 #(32) res_mux(alu_out, read_data, mem_to_reg, res);
-    sign_ext se(instr[15:0], sign_imm);
+    reg_file rf(clk_i, enable_wreg_i, instr_i32[25:21], instr_i32[20:16],
+                write_reg_l5, res_l32, src_a_l32, write_data_o32);
+    mux2 #(5) wr_mux(instr_i32[20:16], instr_i32[15:11],
+                     reg_dst_rtrd_i, write_reg_l5);
+    mux2 #(32) res_mux(alu_out_o32, read_data_i32, mem_to_reg_i, res_l32);
+    sign_ext se(instr_i32[15:0], sign_imm_l32);
 
     // ALU logic.
-    mux2 #(32) src_b_mux(write_data, sign_imm, alu_src, src_b);
-    alu alu(src_a, src_b, alu_control, alu_out, zero);
+    mux2 #(32) src_b_mux(write_data_o32, sign_imm_l32, b_alu_input_i, src_b_l32);
+    alu alu(
+        .a_i32(src_a_l32)
+        ,.b_i32(src_b_l32)
+        ,.funct_i6(instr_i32[5:0])
+        ,.alt_ctrl_i2(alu_alt_ctrl_i2)
+        ,.y_o32(alu_out_o32)
+        ,.zero_o(zero_o)
+    );
 endmodule
