@@ -72,6 +72,9 @@ module data_path(
         ,.y_o32(alu_out_o32)
         ,.zero_o(zero_o)
     );
+
+
+    // TODO: remove when done with op implementations.
     always @(posedge clk_i)
         if (instr_i32[5:0] == `FUNCT6_SLL && instr_i32[31:26] == `INSTR_RTYPE)
         begin

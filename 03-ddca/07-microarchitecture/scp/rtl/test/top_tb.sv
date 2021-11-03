@@ -38,8 +38,6 @@ module top_tb(
     // Init test.
     initial
     begin
-        // $display("With shift 00021080 posedge printing");
-        $display("With shift");
         reset <= 1; #22; reset <= 0;
     end
 
