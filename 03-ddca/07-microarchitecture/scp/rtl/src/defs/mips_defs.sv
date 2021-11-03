@@ -48,4 +48,5 @@
 // ALU Alt Control
 `define ALU_ADD_ALT 2'b00
 `define ALU_SUB_ALT 2'b01
+`define ALU_SLT_ALT 2'b11
 `define ALU_DIS_ALT 2'b10
