@@ -7,7 +7,8 @@ module data_path(
     input logic         clk_i
     ,input logic        reset_i
     ,input logic        mem_to_reg_i
-    ,input logic        pc_branch_i
+    ,input logic        pc_beq_i
+    //,input logic        pc_bne_i
     ,input logic        b_alu_input_i
     ,input logic        reg_dst_rtrd_i
     ,input logic        enable_wreg_i
@@ -39,12 +40,14 @@ module data_path(
     logic [31:0] src_b_l32;
     logic [31:0] res_l32;
 
+    // FIXME: beq & bne form complete set.
+
     // Next PC logic.
     flopr #(32) pc_reg(clk_i, reset_i, pc_next_l32, pc_o32);
     adder pc_add1(pc_o32, 32'b100, pc_plus4_l32);
     sl2 immsh(sign_imm_l32, sign_immsh_l32);
     adder pc_add2(pc_plus4_l32, sign_immsh_l32, pc_branch_l32);
-    mux2 #(32) pc_br_mux(pc_plus4_l32, pc_branch_l32, pc_branch_i, pc_next_br_l32);
+    mux2 #(32) pc_br_mux(pc_plus4_l32, pc_branch_l32, pc_beq_i, pc_next_br_l32);
     mux2 #(32) pc_mux(pc_next_br_l32, { pc_plus4_l32[31:28], instr_i32[25:0], 2'b00 },
                             pc_j_i, pc_next_l32); 
 
@@ -70,8 +73,7 @@ module data_path(
         ,.funct_i6(instr_i32[5:0])
         ,.alt_ctrl_i2(alu_alt_ctrl_i2)
         ,.y_o32(alu_out_o32)
-        ,.zero_o(zero_o)
-    );
+        ,.zero_o(zero_o));
 
 
     // TODO: remove when done with op implementations.
@@ -155,6 +157,8 @@ module data_path(
             $display("INSTR IS: ");
             case (instr_i32[31:26])
                 `INSTR_ADDI: $display("INSTR_ADDI");
+                `INSTR_BEQ: $display("INSTR_BEQ");
+                `INSTR_BNE: $display("INSTR_BNE");
                 default: $display("NO CASE");
             endcase
         end

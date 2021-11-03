@@ -22,7 +22,8 @@ module mips(
     logic enable_wreg_l;
     logic pc_j_l;
     logic apply_shift_l;
-    logic pc_branch_l;
+    logic pc_beq_l;
+    //logic pc_bne_l;
     logic zero_l;
 
     logic [1:0] alu_alt_ctrl_l2;
@@ -34,7 +35,8 @@ module mips(
 
         ,.mem_to_reg_o(mem_to_reg_l)
         ,.enable_wmem_o(enable_wmem_o)
-        ,.pc_branch_o(pc_branch_l)
+        ,.pc_beq_o(pc_beq_l)
+        //,.pc_bne_o(pc_bne_l)
         ,.b_alu_input_o(b_alu_input_l)
         ,.reg_dst_rtrd_o(reg_dst_rtrd_l)
         ,.enable_wreg_o(enable_wreg_l)
@@ -47,7 +49,8 @@ module mips(
         .clk_i(clk_i)
         ,.reset_i(reset_i)
         ,.mem_to_reg_i(mem_to_reg_l)
-        ,.pc_branch_i(pc_branch_l)
+        ,.pc_beq_i(pc_beq_l)
+        //,.pc_bne_i(pc_bne_l)
         ,.b_alu_input_i(b_alu_input_l)
         ,.reg_dst_rtrd_i(reg_dst_rtrd_l)
         ,.enable_wreg_i(enable_wreg_l)

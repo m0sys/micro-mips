@@ -29,6 +29,7 @@ module alu(
             default: case(alt_ctrl_i2)
 				`ALU_ADD_ALT: y_o32 <= a_i32 + b_i32;
                 `ALU_SUB_ALT: y_o32 <= a_i32 - b_i32;
+                `ALU_SLT_ALT: y_o32 <= a_i32 < b_i32 ? 1 : 0;
                 default:      y_o32 <= 31'bx;
 			endcase
 		endcase

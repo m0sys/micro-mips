@@ -11,7 +11,8 @@ module controller(
     // OUTPUTS
     ,output logic mem_to_reg_o
     ,output logic enable_wmem_o
-    ,output logic pc_branch_o
+    ,output logic pc_beq_o
+    //,output logic pc_bne_o
     ,output logic b_alu_input_o
     ,output logic reg_dst_rtrd_o
     ,output logic enable_wreg_o
@@ -36,5 +37,6 @@ module controller(
         ,.alu_alt_ctrl_o2(alu_alt_ctrl_o2)
     );
 
-    assign pc_branch_o = branch_l & zero_i;
+    assign pc_beq_o = branch_l & zero_i;
+    //assign pc_bne_o = branch_l & !zero_i;
 endmodule
