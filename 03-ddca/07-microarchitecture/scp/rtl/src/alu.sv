@@ -23,7 +23,7 @@ module alu(
             //`FUNCT6_NOR: 	  y_o32 <= ~(a_i32 | b_i32);
             //`FUNCT6_XOR: 	  y_o32 <= a_i32 ^ b_i32;
             `FUNCT6_SLT: 	  y_o32 <= a_i32 < b_i32 ? 1 : 0;
-            //`FUNCT6_SLL: 	  y_o32 <= a_i32 << b_i32;
+            `FUNCT6_SLL: 	  y_o32 <= a_i32 << b_i32;
             //`FUNCT6_SRL: 	  y_o32 <= a_i32 >> b_i32;
 
             default: case(alt_ctrl_i2)

@@ -21,6 +21,7 @@ module mips(
     logic reg_dst_rtrd_l;
     logic enable_wreg_l;
     logic pc_j_l;
+    logic apply_shift_l;
     logic pc_branch_l;
     logic zero_l;
 
@@ -28,6 +29,7 @@ module mips(
 
     controller c(
         .op_i6(instr_i32[31:26])
+        ,.funct_i6(instr_i32[5:0])
         ,.zero_i(zero_l)
 
         ,.mem_to_reg_o(mem_to_reg_l)
@@ -37,6 +39,7 @@ module mips(
         ,.reg_dst_rtrd_o(reg_dst_rtrd_l)
         ,.enable_wreg_o(enable_wreg_l)
         ,.pc_j_o(pc_j_l)
+        ,.apply_shift_o(apply_shift_l)
         ,.alu_alt_ctrl_o2(alu_alt_ctrl_l2)
     );
 
@@ -49,6 +52,7 @@ module mips(
         ,.reg_dst_rtrd_i(reg_dst_rtrd_l)
         ,.enable_wreg_i(enable_wreg_l)
         ,.pc_j_i(pc_j_l)
+        ,.apply_shift_i(apply_shift_l)
         ,.alu_alt_ctrl_i2(alu_alt_ctrl_l2)
         ,.instr_i32(instr_i32)
         ,.read_data_i32(read_data_i32)
