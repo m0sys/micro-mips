@@ -8,6 +8,7 @@ module data_path(
     ,input logic         reset_i
     ,input logic [31:0]  read_data_i32
     ,input logic         pc_we_i
+    ,input logic         pc_branch_i
     ,input logic         instr_or_data_i
     ,input logic         instr_we_i
     ,input logic         reg_dst_rtrd_i
@@ -20,6 +21,7 @@ module data_path(
     // OUTPUTS
     ,output logic [31:0] addr_o32
     ,output logic [31:0] write_data_o32
+    ,output logic zero_o
     );
 
     logic [31:0] read_data1_l32;
@@ -27,15 +29,16 @@ module data_path(
     logic [4:0]  dst_reg_addr_l5;
     logic [31:0] wb_l32;
     logic [31:0] sign_imm_l32;
+    logic [31:0] sign_immsh_l32;
     logic [31:0] src_a_l32;
     logic [31:0] src_b_l32;
     logic [31:0] alu_res_l32;
+    logic [31:0] next_pc_l32;
     logic [31:0] not_set;
-    logic zero_o;
 
     // Nonarchitectural state elements.
     logic [31:0] pc_reg_l32;
-    flopenr #(32) pc_reg(clk_i, reset_i, pc_we_i, alu_res_l32, pc_reg_l32);
+    flopenr #(32) pc_reg(clk_i, reset_i, pc_we_i, next_pc_l32, pc_reg_l32);
 
     logic [31:0] instr_reg_l32;
     flopenr #(32) instr_reg(clk_i, reset_i, instr_we_i, read_data_i32, instr_reg_l32);
@@ -54,6 +57,7 @@ module data_path(
 
 
     // TODO:  Next PC logic.
+    mux2 #(32) pc_next_mux(alu_res_l32, alu_out_reg_l32, pc_branch_i, next_pc_l32);
     
     // Memory address logic.
     mux2 #(32) addr_mux(pc_reg_l32, alu_out_reg_l32, instr_or_data_i, addr_o32); 
@@ -81,10 +85,11 @@ module data_path(
 
     // Extension logic.
     sign_ext se(instr_reg_l32[15:0], sign_imm_l32);
+    sl2 sl2(instr_reg_l32[15:0], sign_immsh_l32);
 
     // ALU input selection logic.
     mux2 #(32) src_a_mux(pc_reg_l32, a_reg_l32, a_alu_input_i, src_a_l32);
-    mux4 #(32) src_b_mux(b_reg_l32, 32'b100, sign_imm_l32, not_set,
+    mux4 #(32) src_b_mux(b_reg_l32, 32'b100, sign_imm_l32, sign_immsh_l32,
                          b_alu_input_i2, src_b_l32);
     
 
