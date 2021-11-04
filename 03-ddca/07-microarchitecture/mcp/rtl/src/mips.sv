@@ -15,6 +15,7 @@ module mips(
 
     // Control signals.
     logic pc_we_l;
+    logic pc_branch_l;
     logic instr_or_data_l;
     logic instr_we_l;
     logic reg_dst_rtrd_l;
@@ -23,11 +24,16 @@ module mips(
     logic a_alu_input_l;
     logic [1:0] b_alu_input_l2;
     logic [1:0] alu_alt_ctrl_l2; 
+    logic zero_l;
+
+    // TODO: implement the branch logic within controller to abstract it out
+    //       of data path.
 
     controller c(
         // OUTPUTS
         .enable_wmem_o(enable_wmem_o)
         ,.pc_we_o(pc_we_o)
+        ,.pc_branch_o(pc_branch_l)
         ,.instr_or_data_o(instr_or_data_l)
         ,.instr_wreg_o(instr_wreg_l)
         ,.reg_dst_rtrd_o(reg_dst_rtrd_l)
@@ -42,6 +48,7 @@ module mips(
         ,.reset_i(reset_i)
         ,.read_data_i32(read_data_i32)
         ,.pc_we_i(pc_we_l)
+        ,.pc_branch_i(pc_branch_l)
         ,.instr_or_data_i(instr_or_data_l)
         ,.instr_we_i(instr_we_l)
         ,.reg_dst_rtrd_i(reg_dst_rtrd_l)
@@ -54,6 +61,7 @@ module mips(
         // OUTPUTS
         ,.addr_o32(addr_o32)
         ,.write_data_o32(write_data_o32)
+        ,.zero_o(zero_l)
     );
 
 
