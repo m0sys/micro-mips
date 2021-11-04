@@ -42,6 +42,9 @@ module data_path(
     logic [31:0] a_reg_l32;
     flopr #(32) a_reg(clk_i, reset_i, read_data1_l32, a_reg_l32);
 
+    logic [31:0] b_reg_l32;
+    flopr #(32) b_reg(clk_i, reset_i, read_data2_l32, b_reg_l32);
+
     logic [31:0] alu_out_reg_l32;
     flopr #(32) alu_out_reg(clk_i, reset_i, alu_res_l32, alu_out_reg_l32);
 
@@ -56,12 +59,12 @@ module data_path(
         .clk_i(clk_i)
         ,.we3_i(enable_wrf_i)
         ,.ra1_i5(instr_reg_l32[25:21])
-        //,.ra2_i5()
+        ,.ra2_i5(instr_reg_l32[20:16])
         ,.wa3_i5(instr_reg_l32[20:16])
         ,.wd3_i32(data_reg_l32)
 
         ,.rd1_o32(read_data1_l32)
-        //,.rd2_o32()
+        ,.rd2_o32(read_data2_l32)
     );
 
     // Extension logic.
@@ -82,4 +85,8 @@ module data_path(
         ,.y_o32(alu_res_l32)
         ,.zero_o(zero_o)
     );
+
+    // Write back logic.
+    assign write_data_o32 = b_reg_l32;
+
 endmodule
