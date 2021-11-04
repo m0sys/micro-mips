@@ -17,6 +17,8 @@ module mips(
     logic pc_we_l;
     logic instr_or_data_l;
     logic instr_we_l;
+    logic reg_dst_rtrd_l;
+    logic mem_to_reg_l;
     logic enable_wrf_l;
     logic a_alu_input_l;
     logic [1:0] b_alu_input_l2;
@@ -28,6 +30,7 @@ module mips(
         ,.pc_we_o(pc_we_o)
         ,.instr_or_data_o(instr_or_data_l)
         ,.instr_wreg_o(instr_wreg_l)
+        ,.reg_dst_rtrd_o(reg_dst_rtrd_l)
         ,.enable_wrf_o(enable_wrf_l)
         ,.a_alu_input_o(a_alu_input_l)
         ,.b_alu_input_o2(b_alu_input_l2)
@@ -41,6 +44,8 @@ module mips(
         ,.pc_we_i(pc_we_l)
         ,.instr_or_data_i(instr_or_data_l)
         ,.instr_we_i(instr_we_l)
+        ,.reg_dst_rtrd_i(reg_dst_rtrd_l)
+        ,.mem_to_reg_i(mem_to_reg_l)
         ,.enable_wrf_i(enable_wrf_l)
         ,.a_alu_input_i(a_alu_input_l)
         ,.b_alu_input_i2(b_alu_input_l2)
