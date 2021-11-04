@@ -10,6 +10,8 @@ module data_path(
     ,input logic         pc_we_i
     ,input logic         instr_or_data_i
     ,input logic         instr_we_i
+    ,input logic         reg_dst_rtrd_i
+    ,input logic         mem_to_reg_i
     ,input logic         enable_wrf_i
     ,input logic         a_alu_input_i
     ,input logic [1:0]   b_alu_input_i2
@@ -22,6 +24,8 @@ module data_path(
 
     logic [31:0] read_data1_l32;
     logic [31:0] read_data2_l32;
+    logic [4:0]  dst_reg_addr_l5;
+    logic [31:0] wb_l32;
     logic [31:0] sign_imm_l32;
     logic [31:0] src_a_l32;
     logic [31:0] src_b_l32;
@@ -54,14 +58,22 @@ module data_path(
     // Memory address logic.
     mux2 #(32) addr_mux(pc_reg_l32, alu_out_reg_l32, instr_or_data_i, addr_o32); 
 
+    // RF input selection logic.
+    mux2 #(5) waddr_mux(instr_reg_l32[20:16], instr_reg_l32[15:11], 
+                        reg_dst_rtrd_i, dst_reg_addr_l5);
+
+    // Write back logic.
+    mux2 #(32) write_back_mux(alu_out_reg_l32, data_reg_l32, mem_to_reg_i,
+                              wb_l32);
+
     // Register file logic.
     reg_file rf (
         .clk_i(clk_i)
         ,.we3_i(enable_wrf_i)
         ,.ra1_i5(instr_reg_l32[25:21])
         ,.ra2_i5(instr_reg_l32[20:16])
-        ,.wa3_i5(instr_reg_l32[20:16])
-        ,.wd3_i32(data_reg_l32)
+        ,.wa3_i5(dst_reg_addr_l5)
+        ,.wd3_i32(wb_l32)
 
         ,.rd1_o32(read_data1_l32)
         ,.rd2_o32(read_data2_l32)
@@ -72,7 +84,7 @@ module data_path(
 
     // ALU input selection logic.
     mux2 #(32) src_a_mux(pc_reg_l32, a_reg_l32, a_alu_input_i, src_a_l32);
-    mux4 #(32) src_b_mux(not_set, 32'b100, sign_imm_l32, not_set,
+    mux4 #(32) src_b_mux(b_reg_l32, 32'b100, sign_imm_l32, not_set,
                          b_alu_input_i2, src_b_l32);
     
 
@@ -86,7 +98,7 @@ module data_path(
         ,.zero_o(zero_o)
     );
 
-    // Write back logic.
+    // Memory write logic.
     assign write_data_o32 = b_reg_l32;
 
 endmodule
