@@ -22,6 +22,7 @@ module data_path(
     ,output logic [31:0] addr_o32
     ,output logic [31:0] write_data_o32
     ,output logic zero_o
+    ,output logic instr_o32
     );
 
     logic [31:0] read_data1_l32;
@@ -105,5 +106,8 @@ module data_path(
 
     // Memory write logic.
     assign write_data_o32 = b_reg_l32;
+
+    // Send back the loaded instruction.
+    assign instr_o32 = instr_reg_l32;
 
 endmodule
