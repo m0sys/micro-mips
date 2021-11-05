@@ -158,5 +158,11 @@ module controller_fsm(
                 ctrls_l15 <= 15'bxxx10xxx00100xx;
                 nstate <= FETCH;
             end
+            default:
+            begin
+                ctrls_l15 <= 15'bxxxxxxxxxxxxxxx;
+                nstate <= FETCH;
+            end
+            
         endcase
 endmodule

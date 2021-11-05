@@ -22,7 +22,7 @@ module data_path(
     ,output logic [31:0] addr_o32
     ,output logic [31:0] write_data_o32
     ,output logic zero_o
-    ,output logic instr_o32
+    ,output logic [31:0] instr_o32
     );
 
     logic [31:0] read_data1_l32;
@@ -91,7 +91,7 @@ module data_path(
 
     // Extension logic.
     sign_ext se(instr_reg_l32[15:0], sign_imm_l32);
-    sl2 sl2(instr_reg_l32[15:0], sign_immsh_l32);
+    sl2 sl2(sign_imm_l32, sign_immsh_l32);
 
     // ALU input selection logic.
     mux2 #(32) src_a_mux(pc_reg_l32, a_reg_l32, a_alu_input_i, src_a_l32);
@@ -103,7 +103,7 @@ module data_path(
     alu alu(
         .a_i32(src_a_l32)
         ,.b_i32(src_b_l32)
-        ,.funct_i6(instr_l32[5:0])
+        ,.funct_i6(instr_reg_l32[5:0])
         ,.alt_ctrl_i2(alu_alt_ctrl_i2)
         ,.y_o32(alu_res_l32)
         ,.zero_o(zero_o)

@@ -18,8 +18,8 @@ module mem(
         $readmemh("memfile.dat", RAM);
     end
 
-    assign read_data_o32 = RAM[a[31:2]]; // word aligned
+    assign read_data_o32 = RAM[addr_i32[31:2]]; // word aligned
     always @(posedge clk_i)
         if (we_i)
-            RAM[a[31:2]] <= write_data_i32;
+            RAM[addr_i32[31:2]] <= write_data_i32;
 endmodule

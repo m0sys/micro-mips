@@ -15,7 +15,7 @@ module mips(
 
     // Control signals.
     logic pc_we_l;
-    logic pc_branch_l2;
+    logic [1:0] pc_branch_l2;
     logic instr_or_data_l;
     logic instr_we_l;
     logic reg_dst_rtrd_l;
