@@ -102,6 +102,7 @@ module controller_fsm(
                 case (op_i6)
                     `INSTR_LW: nstate <= MEM_READ;
                     `INSTR_SW: nstate <= MEM_WRITE;
+                endcase
             end
             
             MEM_READ: // S3
