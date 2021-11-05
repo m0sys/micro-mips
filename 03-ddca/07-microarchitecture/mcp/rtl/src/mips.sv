@@ -15,7 +15,7 @@ module mips(
 
     // Control signals.
     logic pc_we_l;
-    logic pc_branch_l;
+    logic pc_branch_l2;
     logic instr_or_data_l;
     logic instr_we_l;
     logic reg_dst_rtrd_l;
@@ -43,7 +43,7 @@ module mips(
         // OUTPUTS
         ,.enable_wmem_o(enable_wmem_o)
         ,.pc_we_o(pc_we_o)
-        ,.pc_branch_o(pc_branch_l)
+        ,.pc_branch_o2(pc_branch_l2)
         ,.instr_or_data_o(instr_or_data_l)
         ,.instr_we_o(instr_we_l)
         ,.reg_dst_rtrd_o(reg_dst_rtrd_l)
@@ -59,7 +59,7 @@ module mips(
         ,.reset_i(reset_i)
         ,.read_data_i32(read_data_i32)
         ,.pc_we_i(pc_we_l)
-        ,.pc_branch_i(pc_branch_l)
+        ,.pc_branch_i2(pc_branch_l2)
         ,.instr_or_data_i(instr_or_data_l)
         ,.instr_we_i(instr_we_l)
         ,.reg_dst_rtrd_i(reg_dst_rtrd_l)

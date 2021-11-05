@@ -8,7 +8,7 @@ module data_path(
     ,input logic         reset_i
     ,input logic [31:0]  read_data_i32
     ,input logic         pc_we_i
-    ,input logic         pc_branch_i
+    ,input logic [1:0]   pc_branch_i2
     ,input logic         instr_or_data_i
     ,input logic         instr_we_i
     ,input logic         reg_dst_rtrd_i
@@ -57,8 +57,13 @@ module data_path(
     flopr #(32) alu_out_reg(clk_i, reset_i, alu_res_l32, alu_out_reg_l32);
 
 
-    // TODO:  Next PC logic.
-    mux2 #(32) pc_next_mux(alu_res_l32, alu_out_reg_l32, pc_branch_i, next_pc_l32);
+    // Next PC logic.
+    // NOTE: This mux selects between current cycle's alu result,
+    // previous cycle's alu result (which is stored in alu_out_reg_l32), or
+    // the jump target result computed on current cycle.
+    mux4 #(32) pc_next_mux(alu_res_l32, alu_out_reg_l32,
+                           { pc_reg_l32[31:28], instr_reg_l32[25:0], 2'b00 },
+                           not_set, pc_branch_i2, next_pc_l32);
     
     // Memory address logic.
     mux2 #(32) addr_mux(pc_reg_l32, alu_out_reg_l32, instr_or_data_i, addr_o32); 

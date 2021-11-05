@@ -13,7 +13,7 @@ module controller(
     // OUTPUTS
     ,output logic         enable_wmem_o
     ,output logic         pc_we_o
-    ,output logic         pc_branch_o
+    ,output logic [1:0]   pc_branch_o2
     ,output logic         instr_or_data_o
     ,output logic         instr_we_o
     ,output logic         reg_dst_rtrd_o
@@ -35,7 +35,7 @@ module controller(
         ,.mem_to_reg_o(mem_to_reg_o)
         ,.reg_dst_rtrd_o(reg_dst_rtrd_o)
         ,.instr_or_data_o(instr_or_data_o)
-        ,.pc_branch_o(pc_branch_o)
+        ,.pc_branch_o2(pc_branch_o2)
         ,.b_alu_input_o2(b_alu_input_o2)
         ,.a_alu_input_o(a_alu_input_o)
         ,.instr_we_o(instr_we_o)
