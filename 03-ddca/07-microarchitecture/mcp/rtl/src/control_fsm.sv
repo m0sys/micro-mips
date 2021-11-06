@@ -76,7 +76,6 @@ module controller_fsm(
     begin
         if (reset_i) state <= FETCH;
         else         state <= nstate;
-        
     end
 
     // Next state logic.
@@ -100,6 +99,8 @@ module controller_fsm(
             // of the instruction processing. I.e. ALUResult and ALUOut must
             // be the same by the end of this cycle. Furthermore, IR must no
             // longer change until FETCH is called once again.
+            //
+            // FIXME: no need to distinguish between posedge and negedge.
             begin
                 ctrls_l15 <= 15'bxx0000101010000;
                 nstate <= DECODE;
@@ -253,6 +254,7 @@ module controller_fsm(
                 ctrls_l15 <= 15'bxxx10xxx00100xx;
                 nstate <= FETCH;
             end
+
             default:
             begin
                 ctrls_l15 <= 15'bxxxxxxxxxxxxxxx;
@@ -261,6 +263,7 @@ module controller_fsm(
         endcase
 
         // TODO: remove when done implementing all important opcodes.
+        /*
         always @(posedge clk_i)
         begin
             $display("FSM: Current State: << S%d >>", state);
@@ -280,4 +283,5 @@ module controller_fsm(
             $display("FSM: enable_wrf_o:", enable_wrf_o);
             $display("FSM: alu_alt_ctrl_o2:", alu_alt_ctrl_o2);
         end
+        */
 endmodule

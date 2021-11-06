@@ -45,26 +45,7 @@ module controller(
         ,.enable_wrf_o(enable_wrf_o)
         ,.alu_alt_ctrl_o2(alu_alt_ctrl_o2)
     );
-    // Control Order:
-    //
-    // Mux selects:
-    //      mem_to_reg_o        (MemtoReg)
-    //      reg_dst_rtrd_o      (RegDst)
-    //      instr_or_data_o     (IorD)
-    //      pc_branch_o2         (PCSrc)
-    //      b_alu_input_o2      (ALUSrcB)
-    //      a_alu_input_o       (ALUSrcA)
-    //
-    // Register Enables:
-    //      instr_we_o          (IRWrite)
-    //      enable_wmem_o       (MemWrite)
-    //      pc_write_o          (PCWrite)
-    //      branch_o            (Branch)
-    //      enable_wrf_o        (RegWrite)
-    //      alu_alt_ctrl_o2     (ALUOp)
-
 
     // Branching logic.
     assign pc_we_o = (zero_i & branch_l) | pc_write_l;
-
 endmodule

@@ -39,7 +39,8 @@ module data_path(
 
     // ---------------------------- Datapath spec ----------------------------
     // 1. All reads must occur during the posedge of the clock. 
-    // 2. All writes mustoccur during the negedge of the clock.
+    // 2. All writes must occur during the negedge of the clock.
+    // FIXME: this is not the case?
 
     // Nonarchitectural state elements.
     logic [31:0] pc_reg_l32;
@@ -59,7 +60,6 @@ module data_path(
 
     logic [31:0] alu_out_reg_l32;
     flopr #(32) alu_out_reg(clk_i, reset_i, alu_res_l32, alu_out_reg_l32);
-
 
     // Next PC logic.
     // NOTE: This mux selects between current cycle's alu result,
@@ -101,12 +101,11 @@ module data_path(
     mux2 #(32) src_a_mux(pc_reg_l32, a_reg_l32, a_alu_input_i, src_a_l32);
     mux4 #(32) src_b_mux(b_reg_l32, 32'b100, sign_imm_l32, sign_immsh_l32,
                          b_alu_input_i2, src_b_l32);
-    
 
     // ALU logic.
     alu alu(
-        .clk_i(clk_i)
-        ,.a_i32(src_a_l32)
+        //.clk_i(clk_i)
+        .a_i32(src_a_l32)
         ,.b_i32(src_b_l32)
         ,.funct_i6(instr_reg_l32[5:0])
         ,.alt_ctrl_i2(alu_alt_ctrl_i2)
@@ -121,6 +120,7 @@ module data_path(
     assign instr_o32 = instr_reg_l32;
 
     // TODO: remove when done with op implementations.
+    /*
     always @(posedge clk_i)
     begin
         $display("DP: >>>>>>>>>>>>>>>>>>>>>POSEDGE<<<<<<<<<<<<<<<<<<<<<<<<<");
@@ -180,11 +180,14 @@ module data_path(
             begin
                 $display("--->>> DP: INSTR_J <<<---");
             end
+
             default:
                 $display("--->>> DP: INSTR_NO_MATCH <<<---");
         endcase
     end
+    */
 
+   /*
     always @(negedge clk_i)
     begin
         $display("DP: >>>>>>>>>>>>>>>>>>>>>NEGEDGE<<<<<<<<<<<<<<<<<<<<<<<<<");
@@ -244,9 +247,10 @@ module data_path(
             begin
                 $display("--->>> DP: INSTR_J <<<---");
             end
+
             default:
                 $display("--->>> DP: INSTR_NO_MATCH <<<---");
         endcase
     end
-
+    */
 endmodule
