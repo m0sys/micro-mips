@@ -42,7 +42,7 @@ module mips(
 
         // OUTPUTS
         ,.enable_wmem_o(enable_wmem_o)
-        ,.pc_we_o(pc_we_o)
+        ,.pc_we_o(pc_we_l)
         ,.pc_branch_o2(pc_branch_l2)
         ,.instr_or_data_o(instr_or_data_l)
         ,.instr_we_o(instr_we_l)

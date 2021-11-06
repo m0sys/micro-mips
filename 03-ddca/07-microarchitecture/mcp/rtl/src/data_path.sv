@@ -101,7 +101,8 @@ module data_path(
 
     // ALU logic.
     alu alu(
-        .a_i32(src_a_l32)
+        .clk_i(clk_i)
+        ,.a_i32(src_a_l32)
         ,.b_i32(src_b_l32)
         ,.funct_i6(instr_reg_l32[5:0])
         ,.alt_ctrl_i2(alu_alt_ctrl_i2)
@@ -114,5 +115,64 @@ module data_path(
 
     // Send back the loaded instruction.
     assign instr_o32 = instr_reg_l32;
+
+    // TODO: remove when done with op implementations.
+    always @(negedge clk_i)
+    begin
+        $display("\n\n");
+        $display("DP: instr_reg_l32: %b", instr_reg_l32);
+        $display("DP: pc_reg_l32: ", pc_reg_l32);
+        $display("DP: alu_res_l32: ", alu_res_l32);
+        $display("DP: alu_out_reg_l32: ", alu_out_reg_l32);
+        $display("DP: src_a_l32: ", src_a_l32);
+        $display("DP: src_b_l32: ", src_b_l32);
+        $display("\n");
+        $display("DP: SIGNALS:");
+        $display("DP: MUX SELECTS:");
+        $display("DP: mem_to_reg_i: ", mem_to_reg_i);
+        $display("DP: reg_dst_rtrd_i: ", reg_dst_rtrd_i);
+        $display("DP: instr_or_data_i: ", instr_or_data_i);
+        $display("DP: pc_branch_i2: ", pc_branch_i2);
+        $display("DP: b_alu_input_i2: ", b_alu_input_i2);
+        $display("DP: a_alu_input_i: ", a_alu_input_i);
+        $display("DP: REGISTER ENABLES:");
+        $display("DP: instr_we_i: ", instr_we_i);
+        $display("DP: pc_we_i: ", pc_we_i);
+        $display("DP: enable_wrf_i: ", enable_wrf_i);
+        $display("DP: alu_alt_ctrl_i2: ", alu_alt_ctrl_i2);
+        case (instr_reg_l32[31:26])
+            `INSTR_RTYPE:
+            begin
+                $display("DP: INSTR_RTYPE");
+            end
+
+            `INSTR_LW:
+            begin
+                $display("DP: INSTR_LW");
+            end
+
+            `INSTR_SW:
+            begin
+                $display("DP: INSTR_SW");
+            end
+
+            `INSTR_BEQ:
+            begin
+                $display("DP: INSTR_BEQ");
+            end
+
+            `INSTR_ADDI:
+            begin
+                $display("DP: INSTR_ADDI");
+            end
+
+            `INSTR_J:       
+            begin
+                $display("DP: INSTR_J");
+            end
+            default:
+                $display("DP: INSTR_NO_MATCH");
+        endcase
+    end
 
 endmodule
