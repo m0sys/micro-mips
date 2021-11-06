@@ -37,6 +37,10 @@ module data_path(
     logic [31:0] next_pc_l32;
     logic [31:0] not_set;
 
+    // ---------------------------- Datapath spec ----------------------------
+    // 1. All reads must occur during the posedge of the clock. 
+    // 2. All writes mustoccur during the negedge of the clock.
+
     // Nonarchitectural state elements.
     logic [31:0] pc_reg_l32;
     flopenr #(32) pc_reg(clk_i, reset_i, pc_we_i, next_pc_l32, pc_reg_l32);
@@ -117,15 +121,20 @@ module data_path(
     assign instr_o32 = instr_reg_l32;
 
     // TODO: remove when done with op implementations.
-    always @(negedge clk_i)
+    always @(posedge clk_i)
     begin
-        $display("\n\n");
-        $display("DP: instr_reg_l32: %b", instr_reg_l32);
-        $display("DP: pc_reg_l32: ", pc_reg_l32);
-        $display("DP: alu_res_l32: ", alu_res_l32);
-        $display("DP: alu_out_reg_l32: ", alu_out_reg_l32);
+        $display("DP: instr_reg_l32 (IR): %b", instr_reg_l32);
+        $display("DP: pc_reg_l32 (PC): ", pc_reg_l32);
+        $display("DP: alu_res_l32 (ALUResult): ", alu_res_l32);
+        $display("DP: alu_out_reg_l32 (ALUOut): ", alu_out_reg_l32);
         $display("DP: src_a_l32: ", src_a_l32);
         $display("DP: src_b_l32: ", src_b_l32);
+        $display("DP: read_data1_l32: (RD1) ", read_data1_l32);
+        $display("DP: read_data2_l32: (RD2) ", read_data2_l32);
+        $display("DP: a_reg_l32 (A): ", a_reg_l32);
+        $display("DP: b_reg_l32 (B): ", b_reg_l32);
+        $display("DP: write_data_o32 (WD): ", write_data_o32);
+        $display("DP: addr_o32 (Adr): ", addr_o32);
         $display("\n");
         $display("DP: SIGNALS:");
         $display("DP: MUX SELECTS:");
@@ -143,35 +152,35 @@ module data_path(
         case (instr_reg_l32[31:26])
             `INSTR_RTYPE:
             begin
-                $display("DP: INSTR_RTYPE");
+                $display("--->>> DP: INSTR_RTYPE <<<---");
             end
 
             `INSTR_LW:
             begin
-                $display("DP: INSTR_LW");
+                $display("--->>> DP: INSTR_LW <<<---");
             end
 
             `INSTR_SW:
             begin
-                $display("DP: INSTR_SW");
+                $display("--->>> DP: INSTR_SW <<<---");
             end
 
             `INSTR_BEQ:
             begin
-                $display("DP: INSTR_BEQ");
+                $display("--->>> DP: INSTR_BEQ <<<---");
             end
 
             `INSTR_ADDI:
             begin
-                $display("DP: INSTR_ADDI");
+                $display("--->>> DP: INSTR_ADDI <<<---");
             end
 
             `INSTR_J:       
             begin
-                $display("DP: INSTR_J");
+                $display("--->>> DP: INSTR_J <<<---");
             end
             default:
-                $display("DP: INSTR_NO_MATCH");
+                $display("--->>> DP: INSTR_NO_MATCH <<<---");
         endcase
     end
 

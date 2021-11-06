@@ -22,7 +22,7 @@ module reg_file(
     // Write third port on rising edge of clk. Register 0 is hardwired to 0.
     // NOTE: for piplined processor, write third port on falling edge of clk.
     
-    always_ff @(posedge clk_i)
+    always_ff @(negedge clk_i)
         if (we3_i) rf[wa3_i5] <= wd3_i32;
 
     assign rd1_o32 = (ra1_i5 != 0) ? rf[ra1_i5] : 0;

@@ -32,6 +32,14 @@ module mips(
     // TODO: implement the branch logic within controller to abstract it out
     //       of data path.
 
+    // TODO: remove when done implementing all important opcodes.
+    always @(posedge clk_i)
+    begin
+        $display("\n\n");
+        $display("--------------------------------------------");
+        $display("------------- NEW POSEDGE CYCLE-------------");
+        $display("--------------------------------------------");
+    end
     controller c(
         // INPUTS
         .clk_i(clk_i)

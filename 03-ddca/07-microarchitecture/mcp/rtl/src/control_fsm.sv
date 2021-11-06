@@ -81,6 +81,7 @@ module controller_fsm(
 
     // Next state logic.
     always_comb
+        //---------------------------- FSM Spec ------------------------------ 
         // LW:    FETCH -> DECODE -> MEM_ADR   -> MEM_READ  -> MEM_WB -> FETCH 
         // SW:    FETCH -> DECODE -> MEM_ADR   -> MEM_WRITE -> FETCH
         // RTYPE: FETCH -> DECODE -> EXECUTE   -> ALU_WB    -> FETCH 
@@ -96,7 +97,9 @@ module controller_fsm(
             // into the IR register. Meanwhile, the PC is also incremented by
             // 4 to point to the next instruction. 
             // NOTE: the PC + 4 must be latched into the PC reg in this stage
-            // of the instruction processing.
+            // of the instruction processing. I.e. ALUResult and ALUOut must
+            // be the same by the end of this cycle. Furthermore, IR must no
+            // longer change until FETCH is called once again.
             begin
                 ctrls_l15 <= 15'bxx0000101010000;
                 nstate <= DECODE;
@@ -257,12 +260,24 @@ module controller_fsm(
             end
         endcase
 
+        // TODO: remove when done implementing all important opcodes.
         always @(posedge clk_i)
         begin
-            $display("FSM: Current State: S%d", state);
+            $display("FSM: Current State: << S%d >>", state);
+            //$display("FSM: Next State: << S%d >>", nstate);
             $display("FSM: Current ctrls: S%b", ctrls_l15);
-            $display("FSM: REMAINING SIGNALS:");
+            $display("FSM: SIGNALS:");
+            $display("FSM: mem_to_reg_o:", mem_to_reg_o);
+            $display("FSM: reg_dst_rtrd_o:", reg_dst_rtrd_o);
+            $display("FSM: instr_or_data_o:", instr_or_data_o);
+            $display("FSM: pc_branch_o2:", pc_branch_o2);
+            $display("FSM: b_alu_input_o2:", b_alu_input_o2);
+            $display("FSM: a_alu_input_o:", a_alu_input_o);
+            $display("FSM: instr_we_o:", instr_we_o);
+            $display("FSM: enable_wmem_o:", enable_wmem_o);
             $display("FSM: pc_write_o:", pc_write_o);
             $display("FSM: branch_o:", branch_o);
+            $display("FSM: enable_wrf_o:", enable_wrf_o);
+            $display("FSM: alu_alt_ctrl_o2:", alu_alt_ctrl_o2);
         end
 endmodule

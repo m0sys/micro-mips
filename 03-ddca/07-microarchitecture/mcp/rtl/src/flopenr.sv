@@ -10,7 +10,7 @@ module flopenr #(parameter WIDTH=8) (
     ,output logic [WIDTH-1:0] q
     );
 
-    always_ff @(posedge clk, posedge reset)
+    always_ff @(negedge clk, negedge reset)
         if (reset) q <= 0;
         else if (en) q <= d;
 endmodule
