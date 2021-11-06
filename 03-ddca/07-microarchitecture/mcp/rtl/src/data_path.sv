@@ -123,6 +123,71 @@ module data_path(
     // TODO: remove when done with op implementations.
     always @(posedge clk_i)
     begin
+        $display("DP: >>>>>>>>>>>>>>>>>>>>>POSEDGE<<<<<<<<<<<<<<<<<<<<<<<<<");
+        $display("DP: instr_reg_l32 (IR): %b", instr_reg_l32);
+        $display("DP: pc_reg_l32 (PC): ", pc_reg_l32);
+        $display("DP: alu_res_l32 (ALUResult): ", alu_res_l32);
+        $display("DP: alu_out_reg_l32 (ALUOut): ", alu_out_reg_l32);
+        $display("DP: src_a_l32: ", src_a_l32);
+        $display("DP: src_b_l32: ", src_b_l32);
+        $display("DP: read_data1_l32: (RD1) ", read_data1_l32);
+        $display("DP: read_data2_l32: (RD2) ", read_data2_l32);
+        $display("DP: a_reg_l32 (A): ", a_reg_l32);
+        $display("DP: b_reg_l32 (B): ", b_reg_l32);
+        $display("DP: write_data_o32 (WD): ", write_data_o32);
+        $display("DP: addr_o32 (Adr): ", addr_o32);
+        $display("\n");
+        $display("DP: SIGNALS:");
+        $display("DP: MUX SELECTS:");
+        $display("DP: mem_to_reg_i: ", mem_to_reg_i);
+        $display("DP: reg_dst_rtrd_i: ", reg_dst_rtrd_i);
+        $display("DP: instr_or_data_i: ", instr_or_data_i);
+        $display("DP: pc_branch_i2: ", pc_branch_i2);
+        $display("DP: b_alu_input_i2: ", b_alu_input_i2);
+        $display("DP: a_alu_input_i: ", a_alu_input_i);
+        $display("DP: REGISTER ENABLES:");
+        $display("DP: instr_we_i: ", instr_we_i);
+        $display("DP: pc_we_i: ", pc_we_i);
+        $display("DP: enable_wrf_i: ", enable_wrf_i);
+        $display("DP: alu_alt_ctrl_i2: ", alu_alt_ctrl_i2);
+        case (instr_reg_l32[31:26])
+            `INSTR_RTYPE:
+            begin
+                $display("--->>> DP: INSTR_RTYPE <<<---");
+            end
+
+            `INSTR_LW:
+            begin
+                $display("--->>> DP: INSTR_LW <<<---");
+            end
+
+            `INSTR_SW:
+            begin
+                $display("--->>> DP: INSTR_SW <<<---");
+            end
+
+            `INSTR_BEQ:
+            begin
+                $display("--->>> DP: INSTR_BEQ <<<---");
+            end
+
+            `INSTR_ADDI:
+            begin
+                $display("--->>> DP: INSTR_ADDI <<<---");
+            end
+
+            `INSTR_J:       
+            begin
+                $display("--->>> DP: INSTR_J <<<---");
+            end
+            default:
+                $display("--->>> DP: INSTR_NO_MATCH <<<---");
+        endcase
+    end
+
+    always @(negedge clk_i)
+    begin
+        $display("DP: >>>>>>>>>>>>>>>>>>>>>NEGEDGE<<<<<<<<<<<<<<<<<<<<<<<<<");
         $display("DP: instr_reg_l32 (IR): %b", instr_reg_l32);
         $display("DP: pc_reg_l32 (PC): ", pc_reg_l32);
         $display("DP: alu_res_l32 (ALUResult): ", alu_res_l32);

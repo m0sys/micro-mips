@@ -108,7 +108,7 @@ module controller_fsm(
             DECODE: // S1
             // Decodes the instruction by first reading the register for the
             // two sources specified by the rs and rt fields in the instruction.
-            // The readings are the latched into A and B registers.
+            // The readings are then latched into A and B registers.
             // Then the opcode is sent to this FSM to determine what signals
             // should be presented for the next state. (I.e. it decodes what 
             // the next state of this FSM is based on the opcode provided.)
@@ -123,7 +123,7 @@ module controller_fsm(
             // (I.e. This would not have worked if we were to use values
             // stored in A, B regsiters since the values would not have been
             // available until the negedge - hence, ALUOut would not have been
-            // able to latch onto the results.)
+            // able to latch onto the results in the current cycle.)
             begin
                 ctrls_l15 <= 15'bxxxxx1100000000;
                 case (op_i6) inside
