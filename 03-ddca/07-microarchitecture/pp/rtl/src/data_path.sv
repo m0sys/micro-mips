@@ -42,31 +42,50 @@ module data_path(
 
     // FIXME: beq & bne form complete set.
 
-    // Next PC logic.
+
+    // -------------------------------------------------------------------- //
+    // Fetch Stage -------------------------------------------------------- //
+    // -------------------------------------------------------------------- //
+    
     flopr #(32) pc_reg(clk_i, reset_i, pc_next_l32, pc_o32);
+
+    // Next PC logic.
     adder pc_add1(pc_o32, 32'b100, pc_plus4_l32);
-    sl2 immsh(sign_imm_l32, sign_immsh_l32);
-    adder pc_add2(pc_plus4_l32, sign_immsh_l32, pc_branch_l32);
     mux2 #(32) pc_br_mux(pc_plus4_l32, pc_branch_l32, pc_beq_i, pc_next_br_l32);
+    // TODO: make sure this also goes here.
     mux2 #(32) pc_mux(pc_next_br_l32, { pc_plus4_l32[31:28], instr_i32[25:0], 2'b00 },
                             pc_j_i, pc_next_l32); 
+
+    // -------------------------------------------------------------------- //
+    // Decode Stage ------------------------------------------------------- //
+    // -------------------------------------------------------------------- //
 
     // Register file logic.
     reg_file rf(clk_i, enable_wreg_i, instr_i32[25:21], instr_i32[20:16],
                 dst_reg_addr_l5, res_l32, src_a_reg_l32, write_data_o32);
+
     mux2 #(5) dst_reg_mux(instr_i32[20:16], instr_i32[15:11],
                      reg_dst_rtrd_i, dst_reg_addr_l5);
-    mux2 #(32) res_mux(alu_out_o32, read_data_i32, mem_to_reg_i, res_l32);
 
-    // ALU logic.
+    // Extension logic.
+    sign_ext se(instr_i32[15:0], sign_imm_l32);
+    // TODO: make sure this also goes here.
+    sign_ext #(5) se2(instr_i32[10:6], se_shamt_l32);
+
+    // -------------------------------------------------------------------- //
+    // Execute Stage ------------------------------------------------------ //
+    // -------------------------------------------------------------------- //
+
+    // ALU input selects.
     mux4 #(32) src_b_mux(write_data_o32, sign_imm_l32, se_shamt_l32, se_shamt_l32,
                         { apply_shift_i, b_alu_input_i }, src_b_l32);
     mux2 #(32) src_a_mux(src_a_reg_l32, write_data_o32, apply_shift_i, src_a_l32);
- 
-    // Extension logic.
-    sign_ext se(instr_i32[15:0], sign_imm_l32);
-    sign_ext #(5) se2(instr_i32[10:6], se_shamt_l32);
 
+    // PC branch logic.
+    sl2 immsh(sign_imm_l32, sign_immsh_l32);
+    adder pc_add2(pc_plus4_l32, sign_immsh_l32, pc_branch_l32);
+
+    // ALU logic.
     alu alu(
         .a_i32(src_a_l32)
         ,.b_i32(src_b_l32)
@@ -75,8 +94,23 @@ module data_path(
         ,.y_o32(alu_out_o32)
         ,.zero_o(zero_o));
 
+    // -------------------------------------------------------------------- //
+    // Memory Stage ------------------------------------------------------- //
+    // -------------------------------------------------------------------- //
+
+    //logic [31:0] write_data_l32_M;
+    //assign write_data_o32 = write_data_l32_M;
+
+    // -------------------------------------------------------------------- //
+    // Writeback Stage ---------------------------------------------------- //
+    // -------------------------------------------------------------------- //
+
+    mux2 #(32) res_mux(alu_out_o32, read_data_i32, mem_to_reg_i, res_l32);
+
+
 
     // TODO: remove when done with op implementations.
+    /*
     always @(posedge clk_i)
         if (instr_i32[5:0] == `FUNCT6_SLL && instr_i32[31:26] == `INSTR_RTYPE)
         begin
@@ -162,6 +196,5 @@ module data_path(
                 default: $display("NO CASE");
             endcase
         end
-            
-    
+        */
 endmodule
