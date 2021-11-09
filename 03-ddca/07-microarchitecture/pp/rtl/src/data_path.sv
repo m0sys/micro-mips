@@ -34,21 +34,112 @@ module data_path(
 
     `include "defs/mips_defs.sv"
 
-    logic [4:0] dst_reg_addr_l5;
-    logic [31:0] pc_next_l32;
-    logic [31:0] pc_next_br_l32;
-    logic [31:0] pc_plus4_l32;
-    logic [31:0] pc_branch_l32;
-    logic [31:0] sign_imm_l32;
-    logic [31:0] sign_immsh_l32;
-    logic [31:0] se_shamt_l32;
-    logic [31:0] src_a_reg_l32;
-    logic [31:0] src_a_l32;
-    logic [31:0] src_b_l32;
-    logic [31:0] res_l32;
+    //logic [4:0] dst_reg_addr_l5;
+    //logic [31:0] pc_next_l32;
+    //logic [31:0] pc_next_br_l32;
+    //logic [31:0] pc_plus4_l32;
+    //logic [31:0] pc_branch_l32;
+    //logic [31:0] sign_imm_l32;
+    //logic [31:0] sign_immsh_l32;
+    //logic [31:0] se_shamt_l32;
+    //logic [31:0] src_a_reg_l32;
+    //logic [31:0] src_a_l32;
+    //logic [31:0] src_b_l32;
+    //logic [31:0] res_l32;
 
     // FIXME: beq & bne form complete set.
 
+    // -------------------------------------------------------------------- //
+    // LOGIC DECLR -------------------------------------------------------- //
+    // -------------------------------------------------------------------- //
+
+    // Fetch Stage -------------------------------------------------------- //
+    
+    // Stage Wires.
+    logic [31:0] pc_lf32;
+    logic [31:0] pc_plus4_lf32;
+    logic [31:0] pc_next_br_lf32;
+    logic [31:0] pc_next_lf32;
+
+    // Decode Stage ------------------------------------------------------- //
+
+    // Pipelined Data.
+    logic [31:0] instr_ld32;
+    logic [31:0] pc_plus4_ld32;
+
+    // Pipelined Controls.
+    //logic enable_wreg_ld;
+    //logic mem_to_reg_ld;
+    //logic enable_wmem_ld;
+
+    // Stage Wires.
+    logic [31:0] rd1_ld32;
+    logic [31:0] rd2_ld32;
+    logic [31:0] sign_imm_ld32;
+    logic [31:0] se_shamt_ld32;
+
+    // Execute Stage ------------------------------------------------------ //
+
+    // Pipelined Data.
+    logic [5:0] funct_le6;
+    logic [31:0] rd1_le32;
+    logic [31:0] rd2_le32;
+    logic [4:0]  rt_le5;
+    logic [4:0]  rd_le5;
+    logic [31:0] sign_imm_le32;
+    logic [31:0] se_shamt_le32;
+    logic [31:0] pc_plus4_le32;
+
+    // Pipelined Controls.
+    logic enable_wreg_le;
+    logic mem_to_reg_le;
+    logic enable_wmem_le;
+    logic branch_le;
+    logic pc_j_le;
+    logic [1:0] alu_alt_ctrl_le2;
+    logic b_alu_input_le;
+    logic apply_shift_le;
+    logic reg_dst_rtrd_le;
+
+    // Stage Wires.
+    logic [31:0] src_a_le32;
+    logic [31:0] src_b_le32;
+    logic [31:0] write_data_le32;
+    logic [4:0]  dst_reg_addr_le5;
+    logic [31:0] sign_immsh_le32;
+    logic [31:0] pc_branch_le32;
+    logic [31:0] alu_out_le32;
+    logic zero_le;
+    
+    // Memory Stage ------------------------------------------------------- //
+
+    // Pipelined Data.
+    logic zero_lm;
+    logic [31:0] alu_out_lm32;
+    logic [31:0] write_data_lm32;
+    logic [4:0] dst_reg_addr_lm5;
+    logic [31:0] pc_branch_lm32;
+
+    // Pipelined Controls.
+    logic enable_wreg_lm;
+    logic mem_to_reg_lm;
+    logic enable_wmem_lm;
+    logic branch_lm;
+    logic pc_j_lm;
+
+    // Writeback Stage ---------------------------------------------------- //
+
+    // Pipelined Data.
+    logic [31:0] alu_out_lwb32;
+    logic [31:0] read_data_lwb32;
+    logic [4:0] dst_reg_addr_lwb5;
+
+    // Pipelined Controls.
+    logic enable_wreg_lwb;
+    logic mem_to_reg_lwb;
+    
+    // Stage Wires.
+    logic [31:0] res_lwb32;
 
     // -------------------------------------------------------------------- //
     // Fetch Stage -------------------------------------------------------- //
@@ -56,12 +147,6 @@ module data_path(
     
     // NOTE: instr_i32 is instr_lf32;
     // NOTE: We should not decode the instruction prior to the Decode Stage.
-
-    // Stage Wires.
-    logic [31:0] pc_lf32;
-    logic [31:0] pc_plus4_lf32;
-    logic [31:0] pc_next_br_lf32;
-    logic [31:0] pc_next_lf32;
 
     flopr #(32) pc_reg(clk_i, reset_i, pc_next_lf32, pc_lf32);
 
@@ -98,20 +183,6 @@ module data_path(
     // NOTE: After this stage all input controls are D stage type controls.
     //      e.g. enable_wreg_i === enable_wreg_ld
 
-    // Pipelined Data.
-    logic [31:0] instr_ld32;
-    logic [31:0] pc_plus4_ld32;
-
-    // Pipelined Controls.
-    //logic enable_wreg_ld;
-    //logic mem_to_reg_ld;
-    //logic enable_wmem_ld;
-
-    // Stage Wires.
-    logic [31:0] rd1_ld32;
-    logic [31:0] rd2_ld32;
-    logic [31:0] sign_imm_ld32;
-    logic [31:0] se_shamt_ld32;
 
     // Register file logic.
     reg_file rf(clk_i, enable_wreg_lwb, instr_ld32[25:21], instr_ld32[20:16],
@@ -176,38 +247,6 @@ module data_path(
     // Execute Stage ------------------------------------------------------ //
     // -------------------------------------------------------------------- //
 
-    // Pipelined Data.
-    logic [5:0] funct_le6;
-    logic [31:0] rd1_le32;
-    logic [31:0] rd2_le32;
-    logic [4:0]  rt_le5;
-    logic [4:0]  rd_le5;
-    logic [31:0] sign_imm_le32;
-    logic [31:0] se_shamt_le32;
-    logic [31:0] pc_plus4_le32;
-
-    // Pipelined Controls.
-    logic enable_wreg_le;
-    logic mem_to_reg_le;
-    logic enable_wmem_le;
-    logic branch_le;
-    logic pc_j_le;
-    logic [1:0] alu_alt_ctrl_le2;
-    logic b_alu_input_le;
-    logic apply_shift_le;
-    logic reg_dst_rtrd_le;
-
-    // Stage Wires.
-    logic [31:0] src_a_le32;
-    logic [31:0] src_b_le32;
-    logic [31:0] write_data_le32;
-    logic [4:0]  dst_reg_addr_le5;
-    logic [31:0] sign_immsh_le32;
-    logic [31:0] pc_branch_le32;
-    logic [31:0] alu_out_le32;
-    logic zero_le;
-    
-
     assign write_data_le32 = rd2_le32;
  
     mux2 #(5) dst_reg_mux(rt_le5, rd_le5,
@@ -266,20 +305,6 @@ module data_path(
 
     // NOTE: read_data_i32 is read_data_im32.
     
-    // Pipelined Data.
-    logic zero_lm;
-    logic [31:0] alu_out_lm32;
-    logic [31:0] write_data_lm32;
-    logic [4:0] dst_reg_addr_lm5;
-    logic [31:0] pc_branch_lm32;
-
-    // Pipelined Controls.
-    logic enable_wreg_lm;
-    logic mem_to_reg_lm;
-    logic enable_wmem_lm;
-    logic branch_lm;
-    logic pc_j_lm;
-
     assign zero_o = zero_lm;
     assign alu_out_o32 = alu_out_lm32;
     assign write_data_o32 = write_data_lm32;
@@ -308,17 +333,6 @@ module data_path(
     // -------------------------------------------------------------------- //
     // Writeback Stage ---------------------------------------------------- //
     // -------------------------------------------------------------------- //
-
-    // Pipelined Data.
-    logic [31:0] alu_out_lwb32;
-    logic [31:0] read_data_lwb32;
-    logic [4:0] dst_reg_addr_lwb5;
-
-    // Pipelined Controls.
-    logic enable_wreg_lwb;
-    logic mem_to_reg_lwb;
-    
-    logic [31:0] res_lwb32;
 
     mux2 #(32) res_mux(alu_out_lwb32, read_data_lwb32, mem_to_reg_lwb, res_lwb32);
 
