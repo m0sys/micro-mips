@@ -4,13 +4,15 @@
 
 module controller(
     // INPUTS
-    input logic [5:0] op_i6
-    ,input logic [5:0] funct_i6
-    ,input logic zero_i
+    input logic [5:0] op_i6         // comes from the DECODE stage
+    ,input logic [5:0] funct_i6     // comes from the DECODE stage 
+    ,input logic zero_i             // comes from the MEMORY stage
+    ,input logic branch_i           // comes from the MEMORY stage
 
     // OUTPUTS
-    ,output logic mem_to_reg_o
+    ,output logic mem_to_reg_o    
     ,output logic enable_wmem_o
+    ,output logic branch_o          // to be pipelined until used in MEM stage 
     ,output logic pc_beq_o
     //,output logic pc_bne_o
     ,output logic b_alu_input_o
@@ -21,14 +23,14 @@ module controller(
     ,output logic [1:0] alu_alt_ctrl_o2
     );
 
-    logic branch_l;
+    //logic branch_l;
 
     main_dec md(
         .op_i6(op_i6)
         ,.funct_i6(funct_i6)
         ,.mem_to_reg_o(mem_to_reg_o)
         ,.enable_wmem_o(enable_wmem_o)
-        ,.branch_o(branch_l)
+        ,.branch_o(branch_o)
         ,.b_alu_input_o(b_alu_input_o)
         ,.reg_dst_rtrd_o(reg_dst_rtrd_o)
         ,.enable_wreg_o(enable_wreg_o)
@@ -37,6 +39,6 @@ module controller(
         ,.alu_alt_ctrl_o2(alu_alt_ctrl_o2)
     );
 
-    assign pc_beq_o = branch_l & zero_i;
+    assign pc_beq_o = branch_i & zero_i; // valid only after MEMORY stage
     //assign pc_bne_o = branch_l & !zero_i;
 endmodule

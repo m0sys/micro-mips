@@ -23,22 +23,15 @@ module main_dec(
 
     logic [8:0] ctrls_l9;
     assign { 
-        enable_wreg_o
-        ,reg_dst_rtrd_o
-        ,b_alu_input_o
-        ,branch_o
-        ,enable_wmem_o
-        ,mem_to_reg_o
-        ,pc_j_o
-        ,alu_alt_ctrl_o2
+        enable_wreg_o           // RegWrite
+        ,reg_dst_rtrd_o         // RegDst
+        ,b_alu_input_o          // ALUSrc
+        ,branch_o               // Branch
+        ,enable_wmem_o          // MemWrite
+        ,mem_to_reg_o           // MemToReg
+        ,pc_j_o                 // Jump
+        ,alu_alt_ctrl_o2        
     } = ctrls_l9;
-
-    // assign apply_shift_o = funct_i6 == |{ `FUNCT6_SLL, `FUNCT6_SRL } ? 1 : 0;
-    // always_comb
-    //     case(funct_i6)
-    //         |{ `FUNCT6_SLL, `FUNCT6_SRL }: apply_shift_o <= 1;
-    //         default:                       apply_shift_o <= 0;
-    //     endcase
 
     always_comb
         if (funct_i6 == `FUNCT6_SLL || funct_i6 == `FUNCT6_SRL)
