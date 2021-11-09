@@ -145,6 +145,7 @@ module data_path(
     // Fetch Stage -------------------------------------------------------- //
     // -------------------------------------------------------------------- //
     
+    // FIXME: need to implement flush to handle jumps.
     // NOTE: instr_i32 is instr_lf32;
     // NOTE: We should not decode the instruction prior to the Decode Stage.
 
@@ -339,91 +340,106 @@ module data_path(
 
 
     // TODO: remove when done with op implementations.
-    /*
     always @(posedge clk_i)
-        if (instr_i32[5:0] == `FUNCT6_SLL && instr_i32[31:26] == `INSTR_RTYPE)
+    begin
+        // FIXME: BEQ is causing issues with pipeline hazards.
+        $display("\n\n");
+        $display("instr_ld32: %b", instr_ld32);
+        case(instr_ld32[31:26])
+            `INSTR_RTYPE: $display("RTYPE"); 
+            `INSTR_LW:    $display("LW");    
+            `INSTR_SW:    $display("SW");    
+            `INSTR_BEQ:   $display("BEQ");
+            `INSTR_BNE:   $display("BNE");  
+            `INSTR_J:     $display("J");     
+            `INSTR_ADDI:  $display("ADDI"); 
+            `INSTR_SLTI:  $display("SLTI");  
+            default: $display("What you doin bruh!!?");
+        endcase
+
+        if (instr_ld32[5:0] == `FUNCT6_SLL && instr_ld32[31:26] == `INSTR_RTYPE)
         begin
             $display("INSTR_SLL");
-            $display("src_a_l32 value: ", src_a_l32);
-            $display("src_a_l32 value binary: %b", src_a_l32);
-            $display("src_b_l32 value: ", src_b_l32);
-            $display("src_b_l32 value: binary: %b", src_b_l32);
-            $display("se_shamt_l32: ", se_shamt_l32);
+            $display("src_a_le32 value: ", src_a_le32);
+            $display("src_a_le32 value binary: %b", src_a_le32);
+            $display("src_b_le32 value: ", src_b_le32);
+            $display("src_b_le32 value: binary: %b", src_b_le32);
+            $display("se_shamt_le32: ", se_shamt_le32);
             $display("alu_out_o32: ", alu_out_o32);
-            $display("res_l32: ", res_l32);
-            $display("res_l32: binary: %b", res_l32);
+            $display("res_lwb32: ", res_lwb32);
+            $display("res_lwb32: binary: %b", res_lwb32);
             $display("write_data_o32: ", write_data_o32);
             $display("write_data_o32: binary: %b", write_data_o32);
-            $display("apply_shift_i: ", apply_shift_i);
-            $display("enable_wreg_i: ", enable_wreg_i);
-            $display("dst_reg_addr_l5 ", dst_reg_addr_l5);
+            $display("apply_shift_le: ", apply_shift_le);
+            $display("enable_wreg_lwb: ", enable_wreg_lwb);
+            $display("dst_reg_addr_lwb5 ", dst_reg_addr_lwb5);
         end
 
-        else if (instr_i32[5:0] == `FUNCT6_SRL && instr_i32[31:26] == `INSTR_RTYPE)
+        else if (instr_ld32[5:0] == `FUNCT6_SRL && instr_ld32[31:26] == `INSTR_RTYPE)
         begin
             $display("INSTR_SRL");
-            $display("src_a_l32 value: ", src_a_l32);
-            $display("src_a_l32 value binary: %b", src_a_l32);
-            $display("src_b_l32 value: ", src_b_l32);
-            $display("src_b_l32 value: binary: %b", src_b_l32);
-            $display("se_shamt_l32: ", se_shamt_l32);
+            $display("src_a_le32 value: ", src_a_le32);
+            $display("src_a_le32 value binary: %b", src_a_le32);
+            $display("src_b_le32 value: ", src_b_le32);
+            $display("src_b_le32 value: binary: %b", src_b_le32);
+            $display("se_shamt_le32: ", se_shamt_le32);
             $display("alu_out_o32: ", alu_out_o32);
-            $display("res_l32: ", res_l32);
-            $display("res_l32: binary: %b", res_l32);
+            $display("res_lwb32: ", res_lwb32);
+            $display("res_lwb32: binary: %b", res_lwb32);
             $display("write_data_o32: ", write_data_o32);
             $display("write_data_o32: binary: %b", write_data_o32);
-            $display("apply_shift_i: ", apply_shift_i);
-            $display("enable_wreg_i: ", enable_wreg_i);
-            $display("dst_reg_addr_l5 ", dst_reg_addr_l5);
+            $display("apply_shift_le: ", apply_shift_le);
+            $display("enable_wreg_lwb: ", enable_wreg_lwb);
+            $display("dst_reg_addr_lwb5 ", dst_reg_addr_lwb5);
         end
 
-        else if (instr_i32[31:26] == `INSTR_SW)
+        else if (instr_ld32[31:26] == `INSTR_SW)
         begin
             $display("INSTR_SW");
-            $display("src_a_l32 value: ", src_a_l32);
-            $display("src_a_l32 value binary: %b", src_a_l32);
-            $display("src_b_l32 value: ", src_b_l32);
-            $display("src_b_l32 value: binary: %b", src_b_l32);
-            $display("se_shamt_l32: ", se_shamt_l32);
+            $display("src_a_le32 value: ", src_a_le32);
+            $display("src_a_le32 value binary: %b", src_a_le32);
+            $display("src_b_le32 value: ", src_b_le32);
+            $display("src_b_le32 value: binary: %b", src_b_le32);
+            $display("se_shamt_le32: ", se_shamt_le32);
             $display("alu_out_o32: ", alu_out_o32);
-            $display("res_l32: ", res_l32);
-            $display("res_l32: binary: %b", res_l32);
+            $display("res_lwb32: ", res_lwb32);
+            $display("res_lwb32: binary: %b", res_lwb32);
             $display("write_data_o32: ", write_data_o32);
             $display("write_data_o32: binary: %b", write_data_o32);
-            $display("apply_shift_i: ", apply_shift_i);
-            $display("enable_wreg_i: ", enable_wreg_i);
-            $display("dst_reg_addr_l5 ", dst_reg_addr_l5);
+            $display("apply_shift_le: ", apply_shift_le);
+            $display("enable_wreg_lwb: ", enable_wreg_lwb);
+            $display("dst_reg_addr_lwb5 ", dst_reg_addr_lwb5);
         end
 
-        else if (instr_i32[31:26] == `INSTR_LW)
+        else if (instr_ld32[31:26] == `INSTR_LW)
         begin
             $display("INSTR_LW");
-            $display("src_a_l32 value: ", src_a_l32);
-            $display("src_a_l32 value binary: %b", src_a_l32);
-            $display("src_b_l32 value: ", src_b_l32);
-            $display("src_b_l32 value: binary: %b", src_b_l32);
-            $display("se_shamt_l32: ", se_shamt_l32);
+            $display("src_a_le32 value: ", src_a_le32);
+            $display("src_a_le32 value binary: %b", src_a_le32);
+            $display("src_b_le32 value: ", src_b_le32);
+            $display("src_b_le32 value: binary: %b", src_b_le32);
+            $display("se_shamt_le32: ", se_shamt_le32);
             $display("alu_out_o32: ", alu_out_o32);
-            $display("res_l32: ", res_l32);
-            $display("res_l32: binary: %b", res_l32);
+            $display("res_lwb32: ", res_lwb32);
+            $display("res_lwb32: binary: %b", res_lwb32);
             $display("write_data_o32: ", write_data_o32);
             $display("write_data_o32: binary: %b", write_data_o32);
-            $display("apply_shift_i: ", apply_shift_i);
-            $display("enable_wreg_i: ", enable_wreg_i);
-            $display("dst_reg_addr_l5 ", dst_reg_addr_l5);
+            $display("apply_shift_le: ", apply_shift_le);
+            $display("enable_wreg_lwb: ", enable_wreg_lwb);
+            $display("dst_reg_addr_lwb5 ", dst_reg_addr_lwb5);
         end
-        else if (instr_i32[31:26] == `INSTR_J)
+        else if (instr_ld32[31:26] == `INSTR_J)
             $display("JUMPING BRUH");
         else
         begin
             $display("NO MATCH FOUND");
             $display("INSTR IS: ");
-            case (instr_i32[31:26])
+            case (instr_ld32[31:26])
                 `INSTR_ADDI: $display("INSTR_ADDI");
                 `INSTR_BEQ: $display("INSTR_BEQ");
                 `INSTR_BNE: $display("INSTR_BNE");
                 default: $display("NO CASE");
             endcase
         end
-        */
+    end
 endmodule
