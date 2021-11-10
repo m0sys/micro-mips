@@ -33,6 +33,7 @@ module data_path(
     );
 
     `include "defs/mips_defs.sv"
+    //`include "pipeline_stages/fetch_stage.sv"
 
     //logic [4:0] dst_reg_addr_l5;
     //logic [31:0] pc_next_l32;
@@ -56,10 +57,10 @@ module data_path(
     // Fetch Stage -------------------------------------------------------- //
     
     // Stage Wires.
-    logic [31:0] pc_lf32;
+    //logic [31:0] pc_lf32;
     logic [31:0] pc_plus4_lf32;
-    logic [31:0] pc_next_br_lf32;
-    logic [31:0] pc_next_lf32;
+    //logic [31:0] pc_next_br_lf32;
+    //logic [31:0] pc_next_lf32;
 
     // Hazard Detection Unit Wires.
     logic stall_lf;
@@ -195,49 +196,35 @@ module data_path(
         ,.forward_src_b_o2(forward_src_b_le2)
     );
 
-    // -------------------------------------------------------------------- //
-    // Fetch Stage -------------------------------------------------------- //
-    // -------------------------------------------------------------------- //
-    
-    // FIXME: need to implement flush to handle jumps.
-    // NOTE: instr_i32 is instr_lf32;
-    // NOTE: We should not decode the instruction prior to the Decode Stage.
-
-
-    // Stall logic for LW hazard solution. 
-    //assign lw_stall_lf = ((instr_ld32[25:21] === rt_le5) || (instr_ld32[20:16] === rt_le5)) && mem_to_reg_le;
+    // NOTE: for some reason these assigns are required?
     assign stall_lf = is_hazy_l;
     assign stall_ld = is_hazy_l;
     assign flush_le = is_hazy_l;
 
-    flopenr #(32) pc_reg(clk_i, reset_i, ~stall_lf, pc_next_lf32, pc_lf32);
+    // -------------------------------------------------------------------- //
+    // Fetch Stage -------------------------------------------------------- //
+    // -------------------------------------------------------------------- //
+    
+    fetch_stage fs(
+        .clk_i(clk_i)
+        ,.reset_i(reset_i)
+        ,.is_hazy_i(stall_lf)
+        ,.pc_beq_id(pc_beq_i)
+        ,.pc_j_id(pc_j_i)
+        ,.pc_branch_id32(pc_branch_ld32)
+        ,.pc_plus4_id32(pc_plus4_ld32)
+        ,.instr_id32(instr_ld32)
 
-    // Next PC logic.
-    adder pc_add1(pc_lf32, 32'b100, pc_plus4_lf32);
-
-    // FIXME: these branch muxes definitly have some errors.
-    //        how will pc_plus4_lf32 be in sync with MEM stage if
-    //        if we don't propagate it all the way to MEM stage and send it 
-    //        back to FETCH stage at the same time as the rest of the 
-    //        signals/data?
-    mux2 #(32) pc_br_mux(pc_plus4_lf32, pc_branch_ld32, pc_beq_i,
-                         pc_next_br_lf32);
-
-    // TODO: make sure this also goes here.
-    // FIXME: instr_i32 is not valid when branch is to be taken i.e. at MEM
-    //        stage. Might have to propagate to MEM stage and then send back?
-    mux2 #(32) pc_mux(pc_next_br_lf32, { pc_plus4_lf32[31:28],
-                                         instr_i32[25:0], 2'b00 },
-                      pc_j_lm, pc_next_lf32); 
-
-    assign pc_o32 = pc_lf32;
+        ,.pc_o32(pc_o32)
+        ,.pc_plus4_o32(pc_plus4_lf32)
+    );
 
     // Stage Transition: FETCH -> DECODE.
     if_id_flopenr #(32) fd_flopenr(
         .clk_i(clk_i)
         ,.reset_i(reset_i)
         ,.flush_i(pc_beq_i)
-        ,.en_i(~stall_ld)
+        ,.en_i(!stall_ld)
         
         // FETCH
         ,.instr_if32(instr_i32)
