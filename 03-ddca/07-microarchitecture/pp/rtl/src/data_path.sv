@@ -63,7 +63,7 @@ module data_path(
 
     // Hazard Detection Unit Wires.
     logic stall_lf;
-    logic lw_stall_lf;
+    //logic lw_stall_lf;
     
 
     // Decode Stage ------------------------------------------------------- //
@@ -91,7 +91,7 @@ module data_path(
     logic forward_rd2_ld;
     logic [31:0] forwarding_rd1_ld32;
     logic [31:0] forwarding_rd2_ld32;
-    logic branch_stall_ld;
+    //logic branch_stall_ld;
 
 
     // Execute Stage ------------------------------------------------------ //
@@ -129,8 +129,8 @@ module data_path(
     logic zero_le;
 
     // Hazard Detection Unit Wires.
-    logic [1:0] forward_src_a_le;
-    logic [1:0] forward_src_b_le;
+    logic [1:0] forward_src_a_le2;
+    logic [1:0] forward_src_b_le2;
     logic       flush_le;
     
     // Memory Stage ------------------------------------------------------- //
@@ -146,7 +146,7 @@ module data_path(
     logic enable_wreg_lm;
     logic mem_to_reg_lm;
     logic enable_wmem_lm;
-    logic branch_lm;
+    //logic branch_lm;
     logic pc_j_lm;
 
     // Writeback Stage ---------------------------------------------------- //
@@ -164,6 +164,38 @@ module data_path(
     logic [31:0] res_lwb32;
 
     // -------------------------------------------------------------------- //
+    // Hazard Unit -------------------------------------------------------- //
+    // -------------------------------------------------------------------- //
+
+    logic is_hazy_l;
+    hazy_unit hu(
+        // INPUTS
+        .branch_id(branch_i)
+        ,.mem_to_reg_ie(mem_to_reg_le)
+        ,.enable_wreg_ie(enable_wreg_le)
+        ,.mem_to_reg_im(mem_to_reg_lm)
+        ,.enable_wreg_im(enable_wreg_lm)
+        ,.enable_wreg_iwb(enable_wreg_lwb)
+
+        ,.rs_id5(instr_ld32[25:21])
+        ,.rt_id5(instr_ld32[20:16])
+
+        ,.rs_ie5(rs_le5)
+        ,.rt_ie5(rt_le5)
+
+        ,.dst_reg_addr_ie5(dst_reg_addr_le5)
+        ,.dst_reg_addr_im5(dst_reg_addr_lm5)
+        ,.dst_reg_addr_iwb5(dst_reg_addr_lwb5)
+
+        // OUTPUTS
+        ,.is_hazy_o(is_hazy_l)
+        ,.forward_rd1_o(forward_rd1_ld)
+        ,.forward_rd2_o(forward_rd2_ld)
+        ,.forward_src_a_o2(forward_src_a_le2)
+        ,.forward_src_b_o2(forward_src_b_le2)
+    );
+
+    // -------------------------------------------------------------------- //
     // Fetch Stage -------------------------------------------------------- //
     // -------------------------------------------------------------------- //
     
@@ -173,10 +205,10 @@ module data_path(
 
 
     // Stall logic for LW hazard solution. 
-    assign lw_stall_lf = ((instr_ld32[25:21] === rt_le5) || (instr_ld32[20:16] === rt_le5)) && mem_to_reg_le;
-    assign stall_lf = lw_stall_lf || branch_stall_ld;
-    assign stall_ld = lw_stall_lf || branch_stall_ld;
-    assign flush_le = lw_stall_lf || branch_stall_ld;
+    //assign lw_stall_lf = ((instr_ld32[25:21] === rt_le5) || (instr_ld32[20:16] === rt_le5)) && mem_to_reg_le;
+    assign stall_lf = is_hazy_l;
+    assign stall_ld = is_hazy_l;
+    assign flush_le = is_hazy_l;
 
     flopenr #(32) pc_reg(clk_i, reset_i, ~stall_lf, pc_next_lf32, pc_lf32);
 
@@ -243,6 +275,7 @@ module data_path(
                                );
     
     // Hazard Detection logic.
+    /*
     assign forward_rd1_ld = (instr_ld32[25:21] != 0) && (instr_ld32[25:21] == dst_reg_addr_lm5) && enable_wreg_lm;
     assign forward_rd2_ld = (instr_ld32[20:16] != 0) && (instr_ld32[20:16] == dst_reg_addr_lm5) && enable_wreg_lm;
 
@@ -250,6 +283,7 @@ module data_path(
     && (dst_reg_addr_le5 == instr_ld32[25:21] || dst_reg_addr_le5 == instr_ld32[20:16])
     || branch_i && mem_to_reg_lm 
     && (dst_reg_addr_lm5 == instr_ld32[25:21] || dst_reg_addr_lm5 == instr_ld32[20:16]);
+    */
 
 
     // PC branch logic.
@@ -333,18 +367,19 @@ module data_path(
                              res_lwb32, 
                              alu_out_lm32, 
                              alu_out_lm32,
-                             forward_src_a_le,
+                             forward_src_a_le2,
                              forwarding_src_a_le32
                          );
     mux4 #(32) foward_b_mux(rd2_le32,
                             res_lwb32,
                             alu_out_lm32,
                             alu_out_lm32,
-                            forward_src_b_le,
+                            forward_src_b_le2,
                             forwarding_src_b_le32
                          );
 
     // Hazard Detection Unit.
+    /*
     always_comb 
         if (rs_le5 != 0 && rs_le5 == dst_reg_addr_lm5 && enable_wreg_lm) 
             forward_src_a_le = 2'b10;
@@ -364,6 +399,7 @@ module data_path(
 
         else 
             forward_src_b_le = 2'b00;
+    */
 
     assign write_data_le32 = forwarding_src_b_le32;
  
@@ -427,6 +463,8 @@ module data_path(
     // NOTE: read_data_i32 is read_data_im32.
     
     assign enable_wmem_o = enable_wmem_lm;
+    assign alu_out_o32 = alu_out_lm32;
+    assign write_data_o32 = write_data_lm32;
     //assign branch_o = branch_lm;
 
     // Stage Transition: MEM -> WB.
