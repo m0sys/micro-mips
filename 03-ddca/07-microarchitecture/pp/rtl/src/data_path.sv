@@ -153,10 +153,21 @@ module data_path(
 
     // Next PC logic.
     adder pc_add1(pc_lf32, 32'b100, pc_plus4_lf32);
-    mux2 #(32) pc_br_mux(pc_plus4_lf32, pc_branch_lm32, pc_beq_i, pc_next_br_lf32);
+
+    // FIXME: these branch muxes definitly have some errors.
+    //        how will pc_plus4_lf32 be in sync with MEM stage if
+    //        if we don't propagate it all the way to MEM stage and send it 
+    //        back to FETCH stage at the same time as the rest of the 
+    //        signals/data?
+    mux2 #(32) pc_br_mux(pc_plus4_lf32, pc_branch_lm32, pc_beq_i,
+                         pc_next_br_lf32);
+
     // TODO: make sure this also goes here.
-    mux2 #(32) pc_mux(pc_next_br_lf32, { pc_plus4_lf32[31:28], instr_i32[25:0], 2'b00 },
-                            pc_j_lm, pc_next_lf32); 
+    // FIXME: instr_i32 is not valid when branch is to be taken i.e. at MEM
+    //        stage. Might have to propagate to MEM stage and then send back?
+    mux2 #(32) pc_mux(pc_next_br_lf32, { pc_plus4_lf32[31:28],
+                                         instr_i32[25:0], 2'b00 },
+                      pc_j_lm, pc_next_lf32); 
 
     assign pc_o32 = pc_lf32;
 
@@ -164,12 +175,15 @@ module data_path(
     if_id_flopr #(32) fd_flopr(
         .clk_i(clk_i)
         ,.reset_i(reset_i)
+        
+        // FETCH
         ,.instr_if32(instr_i32)
         ,.pc_plus4_if32(pc_plus4_lf32)
         //,.enable_wreg_if(enable_wreg_i)
         //,.mem_to_reg_if(mem_to_reg_i)
         //,.enable_wmem_if(enable_wmem_i)
 
+        // DECODE
         ,.instr_od32(instr_ld32)
         ,.pc_plus4_od32(pc_plus4_ld32)
         //,.enable_wreg_od(enable_wreg_ld)
@@ -186,12 +200,13 @@ module data_path(
 
 
     // Register file logic.
+    // NOTE: write back is done at WB stage - and read is done at DECODE 
+    //       stage.
     reg_file rf(clk_i, enable_wreg_lwb, instr_ld32[25:21], instr_ld32[20:16],
                 dst_reg_addr_lwb5, res_lwb32, rd1_ld32, rd2_ld32);
 
     // Extension logic.
     sign_ext se(instr_ld32[15:0], sign_imm_ld32);
-    // TODO: make sure this also goes here.
     sign_ext #(5) se2(instr_ld32[10:6], se_shamt_ld32);
 
 
@@ -204,7 +219,8 @@ module data_path(
         .clk_i(clk_i)
         ,.reset_i(reset_i)
 
-        // DECODE data.
+        // DECODE
+        ,.funct_id6(funct_o6)
         ,.rd1_id32(rd1_ld32)
         ,.rd2_id32(rd2_ld32)
         ,.rt_id5(instr_ld32[20:16])
@@ -223,7 +239,7 @@ module data_path(
         ,.apply_shift_id(apply_shift_i)
         ,.reg_dst_rtrd_id(reg_dst_rtrd_i)
 
-        // EXECUTE data.
+        // EXECUTE
         ,.funct_oe6(funct_le6)
         ,.rd1_oe32(rd1_le32)
         ,.rd2_oe32(rd2_le32)
@@ -254,9 +270,11 @@ module data_path(
                      reg_dst_rtrd_le, dst_reg_addr_le5);
 
     // ALU input selects.
-    mux4 #(32) src_b_mux(write_data_le32, sign_imm_le32, se_shamt_le32, se_shamt_le32,
-                        { apply_shift_le, b_alu_input_le }, src_b_le32);
-    mux2 #(32) src_a_mux(rd1_le32, write_data_le32, apply_shift_le, src_a_le32);
+    mux4 #(32) src_b_mux(write_data_le32, sign_imm_le32, se_shamt_le32,
+                         se_shamt_le32,
+                         { apply_shift_le, b_alu_input_le }, src_b_le32);
+    mux2 #(32) src_a_mux(rd1_le32, write_data_le32, apply_shift_le,
+                         src_a_le32);
 
     // PC branch logic.
     sl2 immsh(sign_imm_le32, sign_immsh_le32);
@@ -275,6 +293,8 @@ module data_path(
     ex_mem_flopr #(32) em_flopr(
         .clk_i(clk_i)
         ,.reset_i(reset_i)
+
+        // EXECUTE
         ,.zero_ie(zero_le)
         ,.alu_out_ie32(alu_out_le32)
         ,.write_data_ie32(write_data_le32)
@@ -287,6 +307,7 @@ module data_path(
         ,.branch_ie(branch_le)
         ,.pc_j_ie(pc_j_le)
 
+        // MEM
         ,.zero_om(zero_lm)
         ,.alu_out_om32(alu_out_lm32)
         ,.write_data_om32(write_data_lm32)
@@ -316,6 +337,8 @@ module data_path(
     mem_wb_flopr #(32) mem_wb_flopr(
         .clk_i(clk_i)
         ,.reset_i(reset_i)
+
+        // MEM
         ,.alu_out_im32(alu_out_lm32)
         ,.read_data_im32(read_data_i32)
         ,.dst_reg_addr_im5(dst_reg_addr_lm5)
@@ -323,6 +346,7 @@ module data_path(
         ,.enable_wreg_im(enable_wreg_lm)
         ,.mem_to_reg_im(mem_to_reg_lm)
 
+        // WB
         ,.alu_out_owb32(alu_out_lwb32)
         ,.read_data_owb32(read_data_lwb32)
         ,.dst_reg_addr_owb5(dst_reg_addr_lwb5)
@@ -335,7 +359,8 @@ module data_path(
     // Writeback Stage ---------------------------------------------------- //
     // -------------------------------------------------------------------- //
 
-    mux2 #(32) res_mux(alu_out_lwb32, read_data_lwb32, mem_to_reg_lwb, res_lwb32);
+    mux2 #(32) res_mux(alu_out_lwb32, read_data_lwb32, mem_to_reg_lwb,
+                       res_lwb32);
 
 
 

@@ -5,6 +5,7 @@ module id_ex_flopr #(parameter WIDTH=8)(
     // INPUTS - Decode Stage data
     input logic clk_i
     ,input logic reset_i
+    ,output logic [5:0] funct_id6
     ,input logic [WIDTH-1:0] rd1_id32
     ,input logic [WIDTH-1:0] rd2_id32
     ,input logic [4:0] rt_id5
@@ -45,6 +46,7 @@ module id_ex_flopr #(parameter WIDTH=8)(
     always_ff @(posedge clk_i, posedge reset_i)
         if (reset_i) 
         begin
+            funct_oe6 <= 0;
             rd1_oe32 <= 0;
             rd2_oe32 <= 0;
             rt_oe5 <= 0;
@@ -65,6 +67,7 @@ module id_ex_flopr #(parameter WIDTH=8)(
 
         else
         begin
+            funct_oe6 <= funct_id6;
             rd1_oe32 <= rd1_id32;
             rd2_oe32 <= rd2_id32;
             rt_oe5 <= rt_id5;
