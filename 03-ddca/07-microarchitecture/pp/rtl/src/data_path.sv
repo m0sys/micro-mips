@@ -61,6 +61,11 @@ module data_path(
     logic [31:0] pc_next_br_lf32;
     logic [31:0] pc_next_lf32;
 
+    // Hazard Detection Unit Wires.
+    logic stall_lf;
+    logic lw_stall_lf;
+    
+
     // Decode Stage ------------------------------------------------------- //
 
     // Pipelined Data.
@@ -77,6 +82,9 @@ module data_path(
     logic [31:0] rd2_ld32;
     logic [31:0] sign_imm_ld32;
     logic [31:0] se_shamt_ld32;
+
+    // Hazard Detection Unit Wires.
+    logic stall_ld;
 
     // Execute Stage ------------------------------------------------------ //
 
@@ -115,6 +123,7 @@ module data_path(
     // Hazard Detection Unit Wires.
     logic [1:0] forward_src_a_le;
     logic [1:0] forward_src_b_le;
+    logic       flush_le;
     
     // Memory Stage ------------------------------------------------------- //
 
@@ -154,7 +163,14 @@ module data_path(
     // NOTE: instr_i32 is instr_lf32;
     // NOTE: We should not decode the instruction prior to the Decode Stage.
 
-    flopr #(32) pc_reg(clk_i, reset_i, pc_next_lf32, pc_lf32);
+
+    // Stall logic for LW hazard solution. 
+    assign lw_stall_lf = ((instr_ld32[25:21] === rt_le5) || (instr_ld32[20:16] === rt_le5)) && mem_to_reg_le;
+    assign stall_lf = lw_stall_lf;
+    assign stall_ld = lw_stall_lf;
+    assign flush_le = lw_stall_lf;
+
+    flopenr #(32) pc_reg(clk_i, reset_i, ~stall_lf, pc_next_lf32, pc_lf32);
 
     // Next PC logic.
     adder pc_add1(pc_lf32, 32'b100, pc_plus4_lf32);
@@ -177,9 +193,10 @@ module data_path(
     assign pc_o32 = pc_lf32;
 
     // Stage Transition: FETCH -> DECODE.
-    if_id_flopr #(32) fd_flopr(
+    if_id_flopenr #(32) fd_flopenr(
         .clk_i(clk_i)
         ,.reset_i(reset_i)
+        ,.en_i(~stall_ld)
         
         // FETCH
         ,.instr_if32(instr_i32)
@@ -223,9 +240,10 @@ module data_path(
     id_ex_flopr #(32) de_flopr (
         .clk_i(clk_i)
         ,.reset_i(reset_i)
+        ,.flush_i(flush_le)
 
         // DECODE
-        ,.funct_id6(funct_o6)
+        ,.funct_id6(instr_ld32[5:0])
         ,.rd1_id32(rd1_ld32)
         ,.rd2_id32(rd2_ld32)
         ,.rs_id5(instr_ld32[25:21])
