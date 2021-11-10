@@ -84,6 +84,7 @@ module data_path(
     logic [5:0] funct_le6;
     logic [31:0] rd1_le32;
     logic [31:0] rd2_le32;
+    logic [4:0]  rs_le5;
     logic [4:0]  rt_le5;
     logic [4:0]  rd_le5;
     logic [31:0] sign_imm_le32;
@@ -110,6 +111,10 @@ module data_path(
     logic [31:0] pc_branch_le32;
     logic [31:0] alu_out_le32;
     logic zero_le;
+
+    // Hazard Detection Unit Wires.
+    logic [1:0] forward_src_a_le;
+    logic [1:0] forward_src_b_le;
     
     // Memory Stage ------------------------------------------------------- //
 
@@ -223,6 +228,7 @@ module data_path(
         ,.funct_id6(funct_o6)
         ,.rd1_id32(rd1_ld32)
         ,.rd2_id32(rd2_ld32)
+        ,.rs_id5(instr_ld32[25:21])
         ,.rt_id5(instr_ld32[20:16])
         ,.rd_id5(instr_ld32[15:11])
         ,.sign_imm_id32(sign_imm_ld32)
@@ -243,6 +249,7 @@ module data_path(
         ,.funct_oe6(funct_le6)
         ,.rd1_oe32(rd1_le32)
         ,.rd2_oe32(rd2_le32)
+        ,.rs_oe5(rs_le5)
         ,.rt_oe5(rt_le5)
         ,.rd_oe5(rd_le5)
         ,.sign_imm_oe32(sign_imm_le32)
@@ -264,16 +271,58 @@ module data_path(
     // Execute Stage ------------------------------------------------------ //
     // -------------------------------------------------------------------- //
 
-    assign write_data_le32 = rd2_le32;
+
+    // Forwarding logic for RAW hazard solution.
+    logic [31:0] forwarding_src_a_le32;
+    logic [31:0] forwarding_src_b_le32;
+    mux4 #(32) forward_a_mux(rd1_le32,
+                             res_lwb32, 
+                             alu_out_lm32, 
+                             alu_out_lm32,
+                             forward_src_a_le,
+                             forwarding_src_a_le32
+                         );
+    mux4 #(32) foward_b_mux(rd2_le32,
+                            res_lwb32,
+                            alu_out_lm32,
+                            alu_out_lm32,
+                            forward_src_b_le,
+                            forwarding_src_b_le32
+                         );
+
+    // Hazard Detection Unit.
+    always_comb 
+        if (rs_le5 != 0 && rs_le5 == dst_reg_addr_lm5 && enable_wreg_lm) 
+            forward_src_a_le = 2'b10;
+
+        else if (rs_le5 != 0 && rs_le5 == dst_reg_addr_lwb5 && enable_wreg_lwb)
+            forward_src_a_le = 2'b01;
+
+        else 
+            forward_src_a_le = 2'b00;
+
+    always_comb 
+        if (rt_le5 != 0 && rt_le5 == dst_reg_addr_lm5 && enable_wreg_lm)
+            forward_src_b_le = 2'b10;
+
+        else if (rt_le5 != 0 && rt_le5 == dst_reg_addr_lwb5 && enable_wreg_lwb)
+            forward_src_b_le = 2'b01;
+
+        else 
+            forward_src_b_le = 2'b00;
+
+    assign write_data_le32 = forwarding_src_b_le32;
  
     mux2 #(5) dst_reg_mux(rt_le5, rd_le5,
                      reg_dst_rtrd_le, dst_reg_addr_le5);
+                 
 
     // ALU input selects.
     mux4 #(32) src_b_mux(write_data_le32, sign_imm_le32, se_shamt_le32,
                          se_shamt_le32,
                          { apply_shift_le, b_alu_input_le }, src_b_le32);
-    mux2 #(32) src_a_mux(rd1_le32, write_data_le32, apply_shift_le,
+    mux2 #(32) src_a_mux(forwarding_src_a_le32, write_data_le32, 
+                         apply_shift_le,
                          src_a_le32);
 
     // PC branch logic.

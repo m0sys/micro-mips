@@ -8,6 +8,7 @@ module id_ex_flopr #(parameter WIDTH=8)(
     ,output logic [5:0] funct_id6
     ,input logic [WIDTH-1:0] rd1_id32
     ,input logic [WIDTH-1:0] rd2_id32
+    ,input logic [4:0] rs_id5
     ,input logic [4:0] rt_id5
     ,input logic [4:0] rd_id5
     ,input logic [WIDTH-1:0] sign_imm_id32
@@ -27,6 +28,7 @@ module id_ex_flopr #(parameter WIDTH=8)(
     ,output logic [5:0] funct_oe6
     ,output logic [WIDTH-1:0] rd1_oe32
     ,output logic [WIDTH-1:0] rd2_oe32
+    ,output logic [4:0] rs_oe5
     ,output logic [4:0] rt_oe5
     ,output logic [4:0] rd_oe5
     ,output logic [WIDTH-1:0] sign_imm_oe32
