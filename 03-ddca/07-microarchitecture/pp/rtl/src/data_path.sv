@@ -7,8 +7,8 @@ module data_path(
     input logic         clk_i
     ,input logic        reset_i
     ,input logic        mem_to_reg_i
-    ,input logic        branch_i        // to be pipelined until MEM stage
-    ,input logic        pc_beq_i        // is only valid after MEM stage
+    ,input logic        branch_i        // to be pipelined until DEC stage
+    ,input logic        pc_beq_i        // is only valid after DEC stage
     //,input logic        pc_bne_i
     ,input logic        b_alu_input_i
     ,input logic        reg_dst_rtrd_i
@@ -29,7 +29,7 @@ module data_path(
     ,output logic [5:0]  op_o6
     ,output logic [5:0]  funct_o6
     ,output logic        branch_o       // to be provided to controller once
-                                        // zero_o is available at MEM stage
+                                        // zero_o is available at DEC stage
     );
 
     `include "defs/mips_defs.sv"
@@ -81,10 +81,18 @@ module data_path(
     logic [31:0] rd1_ld32;
     logic [31:0] rd2_ld32;
     logic [31:0] sign_imm_ld32;
+    logic [31:0] sign_immsh_ld32;
     logic [31:0] se_shamt_ld32;
+    logic [31:0] pc_branch_ld32;
 
     // Hazard Detection Unit Wires.
     logic stall_ld;
+    logic forward_rd1_ld;
+    logic forward_rd2_ld;
+    logic [31:0] forwarding_rd1_ld32;
+    logic [31:0] forwarding_rd2_ld32;
+    logic branch_stall_ld;
+
 
     // Execute Stage ------------------------------------------------------ //
 
@@ -166,9 +174,9 @@ module data_path(
 
     // Stall logic for LW hazard solution. 
     assign lw_stall_lf = ((instr_ld32[25:21] === rt_le5) || (instr_ld32[20:16] === rt_le5)) && mem_to_reg_le;
-    assign stall_lf = lw_stall_lf;
-    assign stall_ld = lw_stall_lf;
-    assign flush_le = lw_stall_lf;
+    assign stall_lf = lw_stall_lf || branch_stall_ld;
+    assign stall_ld = lw_stall_lf || branch_stall_ld;
+    assign flush_le = lw_stall_lf || branch_stall_ld;
 
     flopenr #(32) pc_reg(clk_i, reset_i, ~stall_lf, pc_next_lf32, pc_lf32);
 
@@ -180,7 +188,7 @@ module data_path(
     //        if we don't propagate it all the way to MEM stage and send it 
     //        back to FETCH stage at the same time as the rest of the 
     //        signals/data?
-    mux2 #(32) pc_br_mux(pc_plus4_lf32, pc_branch_lm32, pc_beq_i,
+    mux2 #(32) pc_br_mux(pc_plus4_lf32, pc_branch_ld32, pc_beq_i,
                          pc_next_br_lf32);
 
     // TODO: make sure this also goes here.
@@ -196,6 +204,7 @@ module data_path(
     if_id_flopenr #(32) fd_flopenr(
         .clk_i(clk_i)
         ,.reset_i(reset_i)
+        ,.flush_i(pc_beq_i)
         ,.en_i(~stall_ld)
         
         // FETCH
@@ -220,6 +229,33 @@ module data_path(
     // NOTE: After this stage all input controls are D stage type controls.
     //      e.g. enable_wreg_i === enable_wreg_ld
 
+    // Hazard solution for handling control hazard.
+    assign branch_o = branch_i;
+    assign zero_o = forwarding_rd1_ld32 == forwarding_rd2_ld32;
+
+
+    // Handle RAW for beq args.
+    mux2 #(32) forward_rd1_mux(rd1_ld32, alu_out_lm32, forward_rd1_ld,
+                               forwarding_rd1_ld32
+                               );
+    mux2 #(32) forward_rd2_mux(rd2_ld32, alu_out_lm32, forward_rd2_ld,
+                               forwarding_rd2_ld32
+                               );
+    
+    // Hazard Detection logic.
+    assign forward_rd1_ld = (instr_ld32[25:21] != 0) && (instr_ld32[25:21] == dst_reg_addr_lm5) && enable_wreg_lm;
+    assign forward_rd2_ld = (instr_ld32[20:16] != 0) && (instr_ld32[20:16] == dst_reg_addr_lm5) && enable_wreg_lm;
+
+    assign branch_stall_ld = branch_i && enable_wreg_le
+    && (dst_reg_addr_le5 == instr_ld32[25:21] || dst_reg_addr_le5 == instr_ld32[20:16])
+    || branch_i && mem_to_reg_lm 
+    && (dst_reg_addr_lm5 == instr_ld32[25:21] || dst_reg_addr_lm5 == instr_ld32[20:16]);
+
+
+    // PC branch logic.
+    sl2 immsh(sign_imm_ld32, sign_immsh_ld32);
+    adder pc_add2(pc_plus4_ld32, sign_immsh_ld32, pc_branch_ld32);
+    
 
     // Register file logic.
     // NOTE: write back is done at WB stage - and read is done at DECODE 
@@ -343,10 +379,6 @@ module data_path(
                          apply_shift_le,
                          src_a_le32);
 
-    // PC branch logic.
-    sl2 immsh(sign_imm_le32, sign_immsh_le32);
-    adder pc_add2(pc_plus4_le32, sign_immsh_le32, pc_branch_le32);
-
     // ALU logic.
     alu alu(
         .a_i32(src_a_le32)
@@ -394,11 +426,8 @@ module data_path(
 
     // NOTE: read_data_i32 is read_data_im32.
     
-    assign zero_o = zero_lm;
-    assign alu_out_o32 = alu_out_lm32;
-    assign write_data_o32 = write_data_lm32;
     assign enable_wmem_o = enable_wmem_lm;
-    assign branch_o = branch_lm;
+    //assign branch_o = branch_lm;
 
     // Stage Transition: MEM -> WB.
     mem_wb_flopr #(32) mem_wb_flopr(

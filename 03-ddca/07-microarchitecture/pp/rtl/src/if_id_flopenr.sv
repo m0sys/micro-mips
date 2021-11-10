@@ -5,6 +5,7 @@ module if_id_flopenr #(parameter WIDTH=8)(
     // INPUTS - Fetch Stage data
     input logic clk_i
     ,input logic reset_i
+    ,input logic flush_i
     ,input logic en_i
     ,input logic [WIDTH-1:0] instr_if32
     ,input logic [WIDTH-1:0] pc_plus4_if32
@@ -20,8 +21,8 @@ module if_id_flopenr #(parameter WIDTH=8)(
     //,output logic             enable_wmem_od
     );
 
-    always_ff @(posedge clk_i, posedge reset_i)
-        if (reset_i) 
+    always_ff @(posedge clk_i, posedge reset_i, posedge flush_i)
+        if (reset_i || flush_i) 
         begin
             instr_od32 <= 0;
             pc_plus4_od32 <= 0;

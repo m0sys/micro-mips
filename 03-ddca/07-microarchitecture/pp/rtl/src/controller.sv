@@ -6,13 +6,13 @@ module controller(
     // INPUTS
     input logic [5:0] op_i6         // comes from the DECODE stage
     ,input logic [5:0] funct_i6     // comes from the DECODE stage 
-    ,input logic zero_i             // comes from the MEMORY stage
-    ,input logic branch_i           // comes from the MEMORY stage
+    ,input logic zero_i             // comes from the DECODE stage
+    ,input logic branch_i           // comes from the DECODE stage
 
     // OUTPUTS
     ,output logic mem_to_reg_o    
     ,output logic enable_wmem_o
-    ,output logic branch_o          // to be pipelined until used in MEM stage 
+    ,output logic branch_o          // to be pipelined until used in DEC stage 
     ,output logic pc_beq_o
     //,output logic pc_bne_o
     ,output logic b_alu_input_o
@@ -39,6 +39,6 @@ module controller(
         ,.alu_alt_ctrl_o2(alu_alt_ctrl_o2)
     );
 
-    assign pc_beq_o = branch_i & zero_i; // valid only after MEMORY stage
+    assign pc_beq_o = branch_i & zero_i; // valid only after DECODE stage
     //assign pc_bne_o = branch_l & !zero_i;
 endmodule
