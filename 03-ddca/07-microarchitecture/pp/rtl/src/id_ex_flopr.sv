@@ -19,8 +19,6 @@ module id_ex_flopr #(parameter WIDTH=8)(
     ,input logic             enable_wreg_id
     ,input logic             mem_to_reg_id
     ,input logic             enable_wmem_id
-    ,input logic             branch_id
-    ,input logic             pc_j_id
     ,input logic [1:0]       alu_alt_ctrl_id2
     ,input logic             b_alu_input_id
     ,input logic             apply_shift_id
@@ -39,8 +37,6 @@ module id_ex_flopr #(parameter WIDTH=8)(
     ,output logic             enable_wreg_oe
     ,output logic             mem_to_reg_oe
     ,output logic             enable_wmem_oe
-    ,output logic             branch_oe
-    ,output logic             pc_j_oe
     ,output logic [1:0]       alu_alt_ctrl_oe2
     ,output logic             b_alu_input_oe
     ,output logic             apply_shift_oe
@@ -61,8 +57,6 @@ module id_ex_flopr #(parameter WIDTH=8)(
             enable_wreg_oe <= 0;
             mem_to_reg_oe <= 0;
             enable_wmem_oe <= 0;
-            branch_oe <= 0;
-            pc_j_oe <= 0;
             alu_alt_ctrl_oe2 <= 0;
             b_alu_input_oe <= 0;
             apply_shift_oe <= 0;
@@ -82,8 +76,6 @@ module id_ex_flopr #(parameter WIDTH=8)(
             enable_wreg_oe <= enable_wreg_id;
             mem_to_reg_oe <= mem_to_reg_id;
             enable_wmem_oe <= enable_wmem_id;
-            branch_oe <= branch_id;
-            pc_j_oe <= pc_j_id;
             alu_alt_ctrl_oe2 <= alu_alt_ctrl_id2;
             b_alu_input_oe <= b_alu_input_id;
             apply_shift_oe <= apply_shift_id;
