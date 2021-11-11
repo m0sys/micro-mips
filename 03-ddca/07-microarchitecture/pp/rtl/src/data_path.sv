@@ -57,14 +57,10 @@ module data_path(
     // Fetch Stage -------------------------------------------------------- //
     
     // Stage Wires.
-    //logic [31:0] pc_lf32;
     logic [31:0] pc_plus4_lf32;
-    //logic [31:0] pc_next_br_lf32;
-    //logic [31:0] pc_next_lf32;
 
     // Hazard Detection Unit Wires.
     logic stall_lf;
-    //logic lw_stall_lf;
     
 
     // Decode Stage ------------------------------------------------------- //
@@ -73,16 +69,11 @@ module data_path(
     logic [31:0] instr_ld32;
     logic [31:0] pc_plus4_ld32;
 
-    // Pipelined Controls.
-    //logic enable_wreg_ld;
-    //logic mem_to_reg_ld;
-    //logic enable_wmem_ld;
-
     // Stage Wires.
     logic [31:0] rd1_ld32;
     logic [31:0] rd2_ld32;
     logic [31:0] sign_imm_ld32;
-    logic [31:0] sign_immsh_ld32;
+    //logic [31:0] sign_immsh_ld32;
     logic [31:0] se_shamt_ld32;
     logic [31:0] pc_branch_ld32;
 
@@ -90,9 +81,8 @@ module data_path(
     logic stall_ld;
     logic forward_rd1_ld;
     logic forward_rd2_ld;
-    logic [31:0] forwarding_rd1_ld32;
-    logic [31:0] forwarding_rd2_ld32;
-    //logic branch_stall_ld;
+    //logic [31:0] forwarding_rd1_ld32;
+    //logic [31:0] forwarding_rd2_ld32;
 
 
     // Execute Stage ------------------------------------------------------ //
@@ -124,7 +114,7 @@ module data_path(
     logic [31:0] src_b_le32;
     logic [31:0] write_data_le32;
     logic [4:0]  dst_reg_addr_le5;
-    logic [31:0] sign_immsh_le32;
+    //logic [31:0] sign_immsh_le32;
     logic [31:0] pc_branch_le32;
     logic [31:0] alu_out_le32;
     logic zero_le;
@@ -229,69 +219,38 @@ module data_path(
         // FETCH
         ,.instr_if32(instr_i32)
         ,.pc_plus4_if32(pc_plus4_lf32)
-        //,.enable_wreg_if(enable_wreg_i)
-        //,.mem_to_reg_if(mem_to_reg_i)
-        //,.enable_wmem_if(enable_wmem_i)
 
         // DECODE
         ,.instr_od32(instr_ld32)
         ,.pc_plus4_od32(pc_plus4_ld32)
-        //,.enable_wreg_od(enable_wreg_ld)
-        //,.mem_to_reg_od(mem_to_reg_ld)
-        //,.enable_wmem_od(enable_wmem_ld)
     );
 
     // -------------------------------------------------------------------- //
     // Decode Stage ------------------------------------------------------- //
     // -------------------------------------------------------------------- //
 
-    // NOTE: After this stage all input controls are D stage type controls.
-    //      e.g. enable_wreg_i === enable_wreg_ld
-
-    // Hazard solution for handling control hazard.
-    assign branch_o = branch_i;
-    assign zero_o = forwarding_rd1_ld32 == forwarding_rd2_ld32;
-
-
-    // Handle RAW for beq args.
-    mux2 #(32) forward_rd1_mux(rd1_ld32, alu_out_lm32, forward_rd1_ld,
-                               forwarding_rd1_ld32
-                               );
-    mux2 #(32) forward_rd2_mux(rd2_ld32, alu_out_lm32, forward_rd2_ld,
-                               forwarding_rd2_ld32
-                               );
-    
-    // Hazard Detection logic.
-    /*
-    assign forward_rd1_ld = (instr_ld32[25:21] != 0) && (instr_ld32[25:21] == dst_reg_addr_lm5) && enable_wreg_lm;
-    assign forward_rd2_ld = (instr_ld32[20:16] != 0) && (instr_ld32[20:16] == dst_reg_addr_lm5) && enable_wreg_lm;
-
-    assign branch_stall_ld = branch_i && enable_wreg_le
-    && (dst_reg_addr_le5 == instr_ld32[25:21] || dst_reg_addr_le5 == instr_ld32[20:16])
-    || branch_i && mem_to_reg_lm 
-    && (dst_reg_addr_lm5 == instr_ld32[25:21] || dst_reg_addr_lm5 == instr_ld32[20:16]);
-    */
-
-
-    // PC branch logic.
-    sl2 immsh(sign_imm_ld32, sign_immsh_ld32);
-    adder pc_add2(pc_plus4_ld32, sign_immsh_ld32, pc_branch_ld32);
-    
-
-    // Register file logic.
-    // NOTE: write back is done at WB stage - and read is done at DECODE 
-    //       stage.
-    reg_file rf(clk_i, enable_wreg_lwb, instr_ld32[25:21], instr_ld32[20:16],
-                dst_reg_addr_lwb5, res_lwb32, rd1_ld32, rd2_ld32);
-
-    // Extension logic.
-    sign_ext se(instr_ld32[15:0], sign_imm_ld32);
-    sign_ext #(5) se2(instr_ld32[10:6], se_shamt_ld32);
-
-
-    // Decode Control Wiring.
-    assign op_o6 = instr_ld32[31:26];
-    assign funct_o6 = instr_ld32[5:0];
+    decode_stage ds(
+        .clk_i(clk_i)
+        ,.branch_i(branch_i)
+        ,.instr_id32(instr_ld32)
+        ,.pc_plus4_id32(pc_plus4_ld32)
+        ,.alu_out_im32(alu_out_lm32)
+        ,.forward_rd1_id(forward_rd1_ld)
+        ,.forward_rd2_id(forward_rd2_ld)
+        ,.dst_reg_addr_iwb5(dst_reg_addr_lwb5)
+        ,.res_iwb32(res_lwb32)
+        ,.enable_wreg_iwb(enable_wreg_lwb)
+        
+        ,.branch_o(branch_o)
+        ,.zero_o(zero_o)
+        ,.op_o6(op_o6)
+        ,.funct_o6(funct_o6)
+        ,.rd1_o32(rd1_ld32)
+        ,.rd2_o32(rd2_ld32)
+        ,.pc_branch_o32(pc_branch_ld32)
+        ,.sign_imm_o32(sign_imm_ld32)
+        ,.se_shamt_o32(se_shamt_ld32)
+    );
 
     // Stage Transition: DECODE -> EXECUTE.
     id_ex_flopr #(32) de_flopr (
