@@ -15,7 +15,6 @@ module id_ex_flopr #(parameter WIDTH=8)(
     ,input logic [4:0] rd_id5
     ,input logic [WIDTH-1:0] sign_imm_id32
     ,input logic [WIDTH-1:0] se_shamt_id32
-    ,input logic [WIDTH-1:0] pc_plus4_id32
     ,input logic             enable_wreg_id
     ,input logic             mem_to_reg_id
     ,input logic             enable_wmem_id
@@ -33,7 +32,6 @@ module id_ex_flopr #(parameter WIDTH=8)(
     ,output logic [4:0] rd_oe5
     ,output logic [WIDTH-1:0] sign_imm_oe32
     ,output logic [WIDTH-1:0] se_shamt_oe32
-    ,output logic [WIDTH-1:0] pc_plus4_oe32
     ,output logic             enable_wreg_oe
     ,output logic             mem_to_reg_oe
     ,output logic             enable_wmem_oe
@@ -53,7 +51,6 @@ module id_ex_flopr #(parameter WIDTH=8)(
             rd_oe5 <= 0;
             sign_imm_oe32 <= 0;
             se_shamt_oe32 <= 0;
-            pc_plus4_oe32 <= 0;
             enable_wreg_oe <= 0;
             mem_to_reg_oe <= 0;
             enable_wmem_oe <= 0;
@@ -72,7 +69,6 @@ module id_ex_flopr #(parameter WIDTH=8)(
             rd_oe5 <= rd_id5;
             sign_imm_oe32 <= sign_imm_id32;
             se_shamt_oe32 <= se_shamt_id32;
-            pc_plus4_oe32 <= pc_plus4_id32;
             enable_wreg_oe <= enable_wreg_id;
             mem_to_reg_oe <= mem_to_reg_id;
             enable_wmem_oe <= enable_wmem_id;

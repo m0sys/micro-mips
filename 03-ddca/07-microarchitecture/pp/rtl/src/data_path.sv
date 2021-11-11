@@ -48,7 +48,6 @@ module data_path(
     // Hazard Detection Unit Wires.
     logic stall_lf;
     
-
     // Decode Stage ------------------------------------------------------- //
 
     // Pipelined Data.
@@ -59,7 +58,6 @@ module data_path(
     logic [31:0] rd1_ld32;
     logic [31:0] rd2_ld32;
     logic [31:0] sign_imm_ld32;
-    //logic [31:0] sign_immsh_ld32;
     logic [31:0] se_shamt_ld32;
     logic [31:0] pc_branch_ld32;
 
@@ -67,9 +65,6 @@ module data_path(
     logic stall_ld;
     logic forward_rd1_ld;
     logic forward_rd2_ld;
-    //logic [31:0] forwarding_rd1_ld32;
-    //logic [31:0] forwarding_rd2_ld32;
-
 
     // Execute Stage ------------------------------------------------------ //
 
@@ -82,14 +77,11 @@ module data_path(
     logic [4:0]  rd_le5;
     logic [31:0] sign_imm_le32;
     logic [31:0] se_shamt_le32;
-    logic [31:0] pc_plus4_le32;
 
     // Pipelined Controls.
     logic enable_wreg_le;
     logic mem_to_reg_le;
     logic enable_wmem_le;
-    logic branch_le;
-    logic pc_j_le;
     logic [1:0] alu_alt_ctrl_le2;
     logic b_alu_input_le;
     logic apply_shift_le;
@@ -98,7 +90,6 @@ module data_path(
     // Stage Wires.
     logic [31:0] write_data_le32;
     logic [4:0]  dst_reg_addr_le5;
-    logic [31:0] pc_branch_le32;
     logic [31:0] alu_out_le32;
     logic zero_le;
 
@@ -110,18 +101,14 @@ module data_path(
     // Memory Stage ------------------------------------------------------- //
 
     // Pipelined Data.
-    logic zero_lm;
     logic [31:0] alu_out_lm32;
     logic [31:0] write_data_lm32;
     logic [4:0] dst_reg_addr_lm5;
-    logic [31:0] pc_branch_lm32;
 
     // Pipelined Controls.
     logic enable_wreg_lm;
     logic mem_to_reg_lm;
     logic enable_wmem_lm;
-    //logic branch_lm;
-    logic pc_j_lm;
 
     // Writeback Stage ---------------------------------------------------- //
 
@@ -250,7 +237,6 @@ module data_path(
         ,.rd_id5(instr_ld32[15:11])
         ,.sign_imm_id32(sign_imm_ld32)
         ,.se_shamt_id32(se_shamt_ld32)
-        ,.pc_plus4_id32(pc_plus4_ld32)
 
         ,.enable_wreg_id(enable_wreg_i)
         ,.mem_to_reg_id(mem_to_reg_i)
@@ -269,7 +255,6 @@ module data_path(
         ,.rd_oe5(rd_le5)
         ,.sign_imm_oe32(sign_imm_le32)
         ,.se_shamt_oe32(se_shamt_le32)
-        ,.pc_plus4_oe32(pc_plus4_le32)
 
         ,.enable_wreg_oe(enable_wreg_le)
         ,.mem_to_reg_oe(mem_to_reg_le)
