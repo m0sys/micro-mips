@@ -34,8 +34,6 @@ module decode_stage(
     logic [31:0] rd1_l32;
     logic [31:0] rd2_l32;
     logic [31:0] sign_immsh_l32;
-    //logic [31:0] sign_imm_l32;
-    //logic [31:0] se_shamt_l32;
 
     // Register file logic.
     // NOTE: write back is done at WB stage - and read is done at DECODE 
@@ -67,4 +65,21 @@ module decode_stage(
     // Decode Control Wiring.
     assign op_o6 = instr_id32[31:26];
     assign funct_o6 = instr_id32[5:0];
+
+    always @(posedge clk_i)
+    begin
+		$display("\n\n");
+		$display("New CLK");
+        $display("DP: DS: rd1_o32: ", rd1_o32);
+        $display("DP: DS: rd2_o32: ", rd2_o32);
+        $display("DP: DS: sign_imm_o32: ", sign_imm_o32);
+        $display("DP: DS: sign_imm_o32 bin: %b", sign_imm_o32);
+        $display("DP: DS: instr_id32[15:0]: ", instr_id32[15:0]);
+        $display("DP: DS: instr_id32[15:0]: %b", instr_id32[15:0]);
+        $display("DP: DS: alu_out_im32: ", alu_out_im32);
+        $display("DP: DS: forward_rd1_id: ", forward_rd1_id);
+        $display("DP: DS: forward_rd2_id: ", forward_rd2_id);
+        $display("DP: DS: rs: ", instr_id32[25:21]);
+        $display("DP: DS: rt: ", instr_id32[20:16]);
+    end
 endmodule

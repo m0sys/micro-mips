@@ -3,33 +3,33 @@
 
 module id_ex_flopr #(parameter WIDTH=8)(
     // INPUTS - Decode Stage data
-    input logic clk_i
-    ,input logic reset_i
-    ,input logic flush_i
+    input logic               clk_i
+    ,input logic              reset_i
+    ,input logic              flush_i
 
-    ,output logic [5:0] funct_id6
-    ,input logic [WIDTH-1:0] rd1_id32
-    ,input logic [WIDTH-1:0] rd2_id32
-    ,input logic [4:0] rs_id5
-    ,input logic [4:0] rt_id5
-    ,input logic [4:0] rd_id5
-    ,input logic [WIDTH-1:0] sign_imm_id32
-    ,input logic [WIDTH-1:0] se_shamt_id32
-    ,input logic             enable_wreg_id
-    ,input logic             mem_to_reg_id
-    ,input logic             enable_wmem_id
-    ,input logic [1:0]       alu_alt_ctrl_id2
-    ,input logic             b_alu_input_id
-    ,input logic             apply_shift_id
-    ,input logic             reg_dst_rtrd_id
+    ,input logic [5:0]        funct_id6
+    ,input logic [WIDTH-1:0]  rd1_id32
+    ,input logic [WIDTH-1:0]  rd2_id32
+    ,input logic [4:0]        rs_id5
+    ,input logic [4:0]        rt_id5
+    ,input logic [4:0]        rd_id5
+    ,input logic [WIDTH-1:0]  sign_imm_id32
+    ,input logic [WIDTH-1:0]  se_shamt_id32
+    ,input logic              enable_wreg_id
+    ,input logic              mem_to_reg_id
+    ,input logic              enable_wmem_id
+    ,input logic [1:0]        alu_alt_ctrl_id2
+    ,input logic              b_alu_input_id
+    ,input logic              apply_shift_id
+    ,input logic              reg_dst_rtrd_id
 
     // OUTPUTS - Execute Stage data
-    ,output logic [5:0] funct_oe6
+    ,output logic [5:0]       funct_oe6
     ,output logic [WIDTH-1:0] rd1_oe32
     ,output logic [WIDTH-1:0] rd2_oe32
-    ,output logic [4:0] rs_oe5
-    ,output logic [4:0] rt_oe5
-    ,output logic [4:0] rd_oe5
+    ,output logic [4:0]       rs_oe5
+    ,output logic [4:0]       rt_oe5
+    ,output logic [4:0]       rd_oe5
     ,output logic [WIDTH-1:0] sign_imm_oe32
     ,output logic [WIDTH-1:0] se_shamt_oe32
     ,output logic             enable_wreg_oe
@@ -47,6 +47,7 @@ module id_ex_flopr #(parameter WIDTH=8)(
             funct_oe6 <= 0;
             rd1_oe32 <= 0;
             rd2_oe32 <= 0;
+            rs_oe5 <= 0;
             rt_oe5 <= 0;
             rd_oe5 <= 0;
             sign_imm_oe32 <= 0;
@@ -65,6 +66,7 @@ module id_ex_flopr #(parameter WIDTH=8)(
             funct_oe6 <= funct_id6;
             rd1_oe32 <= rd1_id32;
             rd2_oe32 <= rd2_id32;
+            rs_oe5 <= rs_id5;
             rt_oe5 <= rt_id5;
             rd_oe5 <= rd_id5;
             sign_imm_oe32 <= sign_imm_id32;

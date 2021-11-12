@@ -128,6 +128,7 @@ module data_path(
     // Hazard Unit -------------------------------------------------------- //
     // -------------------------------------------------------------------- //
 
+    // FIXME: forwarding is not working!!!!!
     logic is_hazy_l;
     hazy_unit hu(
         // INPUTS
@@ -238,9 +239,13 @@ module data_path(
         ,.sign_imm_id32(sign_imm_ld32)
         ,.se_shamt_id32(se_shamt_ld32)
 
+        // WB signals
         ,.enable_wreg_id(enable_wreg_i)
+
+        // MEM signals
         ,.mem_to_reg_id(mem_to_reg_i)
         ,.enable_wmem_id(enable_wmem_i)
+
         ,.alu_alt_ctrl_id2(alu_alt_ctrl_i2)
         ,.b_alu_input_id(b_alu_input_i)
         ,.apply_shift_id(apply_shift_i)
@@ -270,7 +275,8 @@ module data_path(
     // -------------------------------------------------------------------- //
 
     exec_stage es(
-        .rd1_ie32(rd1_le32)
+        .clk_i(clk_i)
+        ,.rd1_ie32(rd1_le32)
         ,.rd2_ie32(rd2_le32)
         ,.alu_out_im32(alu_out_lm32)
         ,.res_iwb32(res_lwb32)
@@ -356,13 +362,104 @@ module data_path(
     mux2 #(32) res_mux(alu_out_lwb32, read_data_lwb32, mem_to_reg_lwb,
                        res_lwb32);
 
+    always @(posedge clk_i)
+    begin
+		$display("\n\n");
+        $display("DP: instr_i32: ", instr_i32);
+        $display("DP: instr_ld32: ", instr_ld32);
+        case(instr_i32[31:26])
+            `INSTR_RTYPE: 
+            begin
+                case(instr_i32[5:0])
+                    `FUNCT6_ADD: $display("iADD");
+                    `FUNCT6_SUB: $display("iSUB");
+                    `FUNCT6_AND: $display("iAND");
+                    `FUNCT6_OR:  $display("iOR");
+                    `FUNCT6_NOR: $display("iNOR");
+                    `FUNCT6_XOR: $display("iXOR");
+                    `FUNCT6_SLT: $display("iSLT");
+                    `FUNCT6_SLL: $display("iSLL");
+                    `FUNCT6_SRL: $display("iSRL");
+                endcase
+            end 
+            `INSTR_LW:    $display("iLW");    
+            `INSTR_SW:    $display("iSW");    
+            `INSTR_BEQ:   $display("iBEQ");
+            `INSTR_BNE:   $display("iBNE");  
+            `INSTR_J:     $display("iJ");     
+            `INSTR_ADDI:  $display("iADDI"); 
+            `INSTR_SLTI:  $display("iSLTI");  
+            default:      $display("iNO_MATCH");
+        endcase
+        case(instr_ld32[31:26])
+            `INSTR_RTYPE: begin
+                case(instr_ld32[5:0])
+                    `FUNCT6_ADD: $display("dADD");
+                    `FUNCT6_SUB: $display("dSUB");
+                    `FUNCT6_AND: $display("dAND");
+                    `FUNCT6_OR:  $display("dOR");
+                    `FUNCT6_NOR: $display("dNOR");
+                    `FUNCT6_XOR: $display("dXOR");
+                    `FUNCT6_SLT: $display("dSLT");
+                    `FUNCT6_SLL: $display("dSLL");
+                    `FUNCT6_SRL: $display("dSRL");
+                endcase
+            end 
+            `INSTR_LW:    $display("dLW");    
+            `INSTR_SW:    $display("dSW");    
+            `INSTR_BEQ:   $display("dBEQ");
+            `INSTR_BNE:   $display("dBNE");  
+            `INSTR_J:     $display("dJ");     
+            `INSTR_ADDI:  $display("dADDI"); 
+            `INSTR_SLTI:  $display("dSLTI");  
+            default:      $display("dNO_MATCH");
+        endcase
+        $display("\n");
+        $display("DP: rd1_ld32: ", rd1_ld32);
+        $display("DP: rd2_ld32: ", rd2_ld32);
+
+        $display("\n");
+        $display("DP: rd1_le32: ", rd1_le32);
+        $display("DP: rd2_le32: ", rd2_le32);
+
+        $display("\n");
+        $display("DP: alu_out_le32: ", alu_out_le32);
+        $display("DP: alu_out_lm32: ", alu_out_lm32);
+        $display("DP: alu_out_o32: ", alu_out_o32);
+
+        //$display("DP: enable_wmem_i: ", enable_wmem_i);
+        //$display("DP: enable_wmem_le: ", enable_wmem_le);
+        //$display("DP: enable_wmem_lm: ", enable_wmem_lm);
+        //$display("DP: enable_wmem_o: ", enable_wmem_o);
+        
+        $display("\n");
+        $display("DP: enable_wreg_i: ", enable_wreg_i);
+        $display("DP: enable_wreg_le: ", enable_wreg_le);
+        $display("DP: enable_wreg_lm: ", enable_wreg_lm);
+        $display("DP: enable_wreg_lwb: ", enable_wreg_lwb);
+
+        $display("\n");
+        $display("DP: rs_le5: ", rs_le5);
+        $display("DP: dst_reg_addr_lm5: ", dst_reg_addr_lm5);
+        $display("DP: dst_reg_addr_lwb5: ", dst_reg_addr_lwb5);
+
+        $display("\n");
+        $display("DP: write_data_le32: ", write_data_le32);
+        $display("DP: write_data_lm32: ", write_data_lm32);
+        $display("DP: write_data_o32: ", write_data_o32);
+
+        $display("\n");
+        $display("DP: forward_src_b_le2: ", forward_src_b_le2);
+    end
+    
 
 
     // TODO: remove when done with op implementations.
+    /*
     always @(posedge clk_i)
     begin
         // FIXME: BEQ is causing issues with pipeline hazards.
-        $display("\n\n");
+        //$display("\n\n");
         $display("instr_ld32: %b", instr_ld32);
         case(instr_ld32[31:26])
             `INSTR_RTYPE: $display("RTYPE"); 
@@ -461,4 +558,5 @@ module data_path(
             endcase
         end
     end
+    */
 endmodule

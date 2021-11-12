@@ -3,7 +3,8 @@
 
 module exec_stage(
     // INPUTS
-    input logic [31:0]  rd1_ie32
+    input logic clk_i
+    ,input logic [31:0]  rd1_ie32
     ,input logic [31:0] rd2_ie32
     ,input logic [31:0] alu_out_im32
     ,input logic [31:0] res_iwb32
@@ -71,4 +72,22 @@ module exec_stage(
         ,.y_o32(alu_out_o32)
         ,.zero_o(zero_o)
         );
+
+    always @(posedge clk_i)
+    begin
+		$display("\n\n");
+        $display("DP: ES: rd1_ie32: ", rd1_ie32);
+        $display("DP: ES: rd2_ie32: ", rd2_ie32);
+        $display("DP: ES: sign_imm_ie32: ", sign_imm_ie32);
+        $display("DP: ES: sign_imm_ie32: %b", sign_imm_ie32);
+        $display("DP: ES: res_iwb32: ", res_iwb32);
+        $display("DP: ES: alu_out_im32: ", alu_out_im32);
+        $display("DP: ES: forward_src_a_ie2: ", forward_src_a_ie2);
+        $display("DP: ES: forward_src_b_ie2: ", forward_src_b_ie2);
+        $display("DP: ES: forwarding_src_a_l32: ", forwarding_src_a_l32);
+        $display("DP: ES: forwarding_src_b_l32: ", forwarding_src_b_l32);
+        $display("DP: ES: src_a_l32: ", src_a_l32);
+        $display("DP: ES: src_b_l32: ", src_b_l32);
+        $display("DP: ES: alu_out_o32: ", alu_out_o32);
+    end
 endmodule
