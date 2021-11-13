@@ -30,4 +30,12 @@ module top(
 
     imem imem(pc_l32[7:2], instr_l32);
     dmem dmem(clk_i, mem_write_o, data_addr_o32, write_data_o32, read_data_l32);
+
+	always @(posedge clk_i)
+	begin
+		$display("\n\n");
+		$display("TOP: write_data_o32: ", write_data_o32);
+		$display("TOP: data_addr_o32: ", data_addr_o32);
+		$display("TOP: mem_write_o: ", mem_write_o);
+	end
 endmodule

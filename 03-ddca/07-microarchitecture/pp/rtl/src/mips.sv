@@ -16,11 +16,17 @@ module mips(
     ,output logic [31:0] write_data_o32
     );
 
+    logic [5:0] op_l6;
+    logic [5:0] funct_l6;
+
     logic mem_to_reg_l;
     logic b_alu_input_l;
     logic reg_dst_rtrd_l;
     logic enable_wreg_l;
+    logic enable_wmem_l;
     logic pc_j_l;
+    logic branch_lm;
+    logic branch_l;
     logic apply_shift_l;
     logic pc_beq_l;
     //logic pc_bne_l;
@@ -29,12 +35,14 @@ module mips(
     logic [1:0] alu_alt_ctrl_l2;
 
     controller c(
-        .op_i6(instr_i32[31:26])
-        ,.funct_i6(instr_i32[5:0])
+        .op_i6(op_l6)
+        ,.funct_i6(funct_l6)
         ,.zero_i(zero_l)
+        ,.branch_i(branch_lm)
 
         ,.mem_to_reg_o(mem_to_reg_l)
-        ,.enable_wmem_o(enable_wmem_o)
+        ,.enable_wmem_o(enable_wmem_l)
+        ,.branch_o(branch_l)
         ,.pc_beq_o(pc_beq_l)
         //,.pc_bne_o(pc_bne_l)
         ,.b_alu_input_o(b_alu_input_l)
@@ -49,11 +57,13 @@ module mips(
         .clk_i(clk_i)
         ,.reset_i(reset_i)
         ,.mem_to_reg_i(mem_to_reg_l)
+        ,.branch_i(branch_l)
         ,.pc_beq_i(pc_beq_l)
         //,.pc_bne_i(pc_bne_l)
         ,.b_alu_input_i(b_alu_input_l)
         ,.reg_dst_rtrd_i(reg_dst_rtrd_l)
         ,.enable_wreg_i(enable_wreg_l)
+        ,.enable_wmem_i(enable_wmem_l)
         ,.pc_j_i(pc_j_l)
         ,.apply_shift_i(apply_shift_l)
         ,.alu_alt_ctrl_i2(alu_alt_ctrl_l2)
@@ -64,5 +74,21 @@ module mips(
         ,.alu_out_o32(alu_out_o32)
         ,.zero_o(zero_l)
         ,.write_data_o32(write_data_o32)
+        ,.enable_wmem_o(enable_wmem_o)
+        ,.op_o6(op_l6)
+        ,.funct_o6(funct_l6)
+        ,.branch_o(branch_lm)
     );
+
+	always @(posedge clk_i)
+	begin
+		$display("\n\n");
+		$display("MIPS: instr_i32: ", instr_i32);
+		$display("MIPS: read_data_i32: ", read_data_i32);
+		$display("MIPS: pc_o32: ", pc_o32);
+		$display("MIPS: enable_wmem_l: ", enable_wmem_l);
+		$display("MIPS: enable_wmem_o: ", enable_wmem_o);
+		$display("MIPS: alu_out_o32: ", alu_out_o32);
+		$display("MIPS: write_data_o32: ", write_data_o32);
+	end
 endmodule
