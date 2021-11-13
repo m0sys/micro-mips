@@ -4,8 +4,8 @@
 
 module mips(
     // INPUTS
-    input logic         clk_i
-    ,input logic reset_i
+    input logic          clk_i
+    ,input logic         reset_i
     ,input logic [31:0]  instr_i32
     ,input logic [31:0]  read_data_i32
 
@@ -79,16 +79,4 @@ module mips(
         ,.funct_o6(funct_l6)
         ,.branch_o(branch_lm)
     );
-
-	always @(posedge clk_i)
-	begin
-		$display("\n\n");
-		$display("MIPS: instr_i32: ", instr_i32);
-		$display("MIPS: read_data_i32: ", read_data_i32);
-		$display("MIPS: pc_o32: ", pc_o32);
-		$display("MIPS: enable_wmem_l: ", enable_wmem_l);
-		$display("MIPS: enable_wmem_o: ", enable_wmem_o);
-		$display("MIPS: alu_out_o32: ", alu_out_o32);
-		$display("MIPS: write_data_o32: ", write_data_o32);
-	end
 endmodule

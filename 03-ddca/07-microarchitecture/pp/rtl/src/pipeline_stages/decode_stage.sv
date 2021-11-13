@@ -66,6 +66,8 @@ module decode_stage(
     assign op_o6 = instr_id32[31:26];
     assign funct_o6 = instr_id32[5:0];
 
+    // TODO: remove when done with op implementations.
+    /*
     always @(posedge clk_i)
     begin
 		$display("\n\n");
@@ -84,4 +86,5 @@ module decode_stage(
         $display("DP: DS: rs: ", instr_id32[25:21]);
         $display("DP: DS: rt: ", instr_id32[20:16]);
     end
+    */
 endmodule

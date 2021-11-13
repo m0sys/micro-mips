@@ -73,6 +73,8 @@ module exec_stage(
         ,.zero_o(zero_o)
         );
 
+    // TODO: remove when done with op implementations.
+    /*
     always @(posedge clk_i)
     begin
 		$display("\n\n");
@@ -90,4 +92,5 @@ module exec_stage(
         $display("DP: ES: src_b_l32: ", src_b_l32);
         $display("DP: ES: alu_out_o32: ", alu_out_o32);
     end
+    */
 endmodule

@@ -35,5 +35,4 @@ module alu(
 		endcase
    
     assign zero_o = (y_o32 == 32'b0) ? 1 : 0;
-
 endmodule

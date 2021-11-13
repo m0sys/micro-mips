@@ -129,7 +129,6 @@ module data_path(
     // Hazard Unit -------------------------------------------------------- //
     // -------------------------------------------------------------------- //
 
-    // FIXME: must handle unconditional jumps!
     logic is_hazy_l;
     hazy_unit hu(
         // INPUTS
@@ -214,7 +213,6 @@ module data_path(
         ,.enable_wreg_iwb(enable_wreg_lwb)
         
         ,.branch_o(branch_o)
-        // FIXME: zero is broken cause branch forwarding/stalling is broken.
         ,.zero_o(zero_o)
         ,.op_o6(op_o6)
         ,.funct_o6(funct_o6)
@@ -225,7 +223,6 @@ module data_path(
         ,.se_shamt_o32(se_shamt_ld32)
     );
 
-    // FIXME: jump is not working!
     assign flush_fetch_ld = pc_beq_i | pc_j_i;
 
     // Stage Transition: DECODE -> EXECUTE.
@@ -366,9 +363,10 @@ module data_path(
 
     mux2 #(32) res_mux(alu_out_lwb32, read_data_lwb32, mem_to_reg_lwb,
                        res_lwb32);
-
     
+
     // TODO: remove when done with op implementations.
+    /*
     always @(posedge clk_i)
     begin
 		$display("\n\n");
@@ -473,62 +471,5 @@ module data_path(
         $display("DP: flush_le: ", flush_le);
         $display("DP: is_hazy_l: ", is_hazy_l);
     end
-
-    always @(negedge clk_i)
-    begin
-        $display("\n");
-        $display("DP: [[ NEGEDGE ]]: ");
-        $display("DP: stall_lf: ", stall_lf);
-        $display("DP: stall_ld: ", stall_ld);
-        $display("DP: flush_le: ", flush_le);
-        $display("DP: is_hazy_l: ", is_hazy_l);
-
-        case(instr_i32[31:26])
-            `INSTR_RTYPE: 
-            begin
-                case(instr_i32[5:0])
-                    `FUNCT6_ADD: $display("DP: <<< iADD >>>");
-                    `FUNCT6_SUB: $display("DP: <<< iSUB >>>");
-                    `FUNCT6_AND: $display("DP: <<< iAND >>>");
-                    `FUNCT6_OR:  $display("DP: <<< iOR >>>");
-                    `FUNCT6_NOR: $display("DP: <<< iNOR >>>");
-                    `FUNCT6_XOR: $display("DP: <<< iXOR >>>");
-                    `FUNCT6_SLT: $display("DP: <<< iSLT >>>");
-                    `FUNCT6_SLL: $display("DP: <<< iSLL >>>");
-                    `FUNCT6_SRL: $display("DP: <<< iSRL >>>");
-                endcase
-            end 
-            `INSTR_LW:    $display("DP: <<< iLW >>>");    
-            `INSTR_SW:    $display("DP: <<< iSW >>>");    
-            `INSTR_BEQ:   $display("DP: <<< iBEQ >>>");
-            `INSTR_BNE:   $display("DP: <<< iBNE >>>");  
-            `INSTR_J:     $display("DP: <<< iJ >>>");     
-            `INSTR_ADDI:  $display("DP: <<< iADDI >>>"); 
-            `INSTR_SLTI:  $display("DP: <<< iSLTI >>>");  
-            default:      $display("DP: <<< iNO_MATCH >>>");
-        endcase
-        case(instr_ld32[31:26])
-            `INSTR_RTYPE: begin
-                case(instr_ld32[5:0])
-                    `FUNCT6_ADD: $display("DP: <<< dADD >>>");
-                    `FUNCT6_SUB: $display("DP: <<< dSUB >>>");
-                    `FUNCT6_AND: $display("DP: <<< dAND >>>");
-                    `FUNCT6_OR:  $display("DP: <<< dOR >>>");
-                    `FUNCT6_NOR: $display("DP: <<< dNOR >>>");
-                    `FUNCT6_XOR: $display("DP: <<< dXOR >>>");
-                    `FUNCT6_SLT: $display("DP: <<< dSLT >>>");
-                    `FUNCT6_SLL: $display("DP: <<< dSLL >>>");
-                    `FUNCT6_SRL: $display("DP: <<< dSRL >>>");
-                endcase
-            end 
-            `INSTR_LW:    $display("DP: <<< dLW >>>");    
-            `INSTR_SW:    $display("DP: <<< dSW >>>");    
-            `INSTR_BEQ:   $display("DP: <<< dBEQ >>>");
-            `INSTR_BNE:   $display("DP: <<< dBNE >>>");  
-            `INSTR_J:     $display("DP: <<< dJ >>>");     
-            `INSTR_ADDI:  $display("DP: <<< dADDI >>>"); 
-            `INSTR_SLTI:  $display("DP: <<< dSLTI >>>");  
-            default:      $display("DP: <<< dNO_MATCH >>>");
-        endcase
-    end
+    */
 endmodule

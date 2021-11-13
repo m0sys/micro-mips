@@ -17,8 +17,6 @@ module fetch_stage(
     ,output logic [31:0] pc_plus4_o32
     );
 
-    //`include "../flopenr.sv"
-
     // NOTE: We should not decode the instruction prior to the Decode Stage.
 
     logic [31:0] pc_l32;

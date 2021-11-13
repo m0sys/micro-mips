@@ -34,9 +34,13 @@ module hazy_unit(
     // Hazard detection logic - LW data hazard; requires stalling for 2c.
     assign lw_stall_l = ((rs_id5 === rt_ie5) || (rt_id5 === rt_ie5)) && mem_to_reg_ie;
 
+    // Hazard detection logic - control hazards; requires stalling for 1c.
+    assign branch_stall_l = branch_id && enable_wreg_ie
+    && (dst_reg_addr_ie5 == rs_id5 || dst_reg_addr_ie5 == rt_id5)
+    || branch_id && mem_to_reg_im 
+    && (dst_reg_addr_im5 == rs_id5 || dst_reg_addr_im5 == rt_id5);
+
     // Forwarding logic for branch arguments.
-    // FIXME: this forwarding ain't working!!!
-    // MIGHT BE AN ISSUE WITH BRANCH STALL.
     assign forward_rd1_o = (rs_id5 != 0)
                         && (rs_id5 == dst_reg_addr_im5) 
                         && enable_wreg_im;
@@ -45,15 +49,8 @@ module hazy_unit(
                         && (rt_id5 == dst_reg_addr_im5) 
                         && enable_wreg_im;
 
-    // Hazard detection logic - control hazards; requires stalling for 1c.
-    assign branch_stall_l = branch_id && enable_wreg_ie
-    && (dst_reg_addr_ie5 == rs_id5 || dst_reg_addr_ie5 == rt_id5)
-    || branch_id && mem_to_reg_im 
-    && (dst_reg_addr_im5 == rs_id5 || dst_reg_addr_im5 == rt_id5);
-
-    // Forwarding logic for RAW sln.
+    // Forwarding logic for arith RAW sln.
     always_comb 
-        // FIXME: this condition should hold!
         if (rs_ie5 != 0 && rs_ie5 == dst_reg_addr_im5 && enable_wreg_im) 
             forward_src_a_o2 = 2'b10;
 
