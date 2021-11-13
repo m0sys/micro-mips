@@ -248,6 +248,7 @@ module data_path(
         ,.mem_to_reg_id(mem_to_reg_i)
         ,.enable_wmem_id(enable_wmem_i)
 
+        // EXEC signals
         ,.alu_alt_ctrl_id2(alu_alt_ctrl_i2)
         ,.b_alu_input_id(b_alu_input_i)
         ,.apply_shift_id(apply_shift_i)
