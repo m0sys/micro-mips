@@ -60,6 +60,7 @@ module data_path(
     logic [31:0] sign_imm_ld32;
     logic [31:0] se_shamt_ld32;
     logic [31:0] pc_branch_ld32;
+    logic flush_fetch_ld;
 
     // Hazard Detection Unit Wires.
     logic stall_ld;
@@ -128,7 +129,7 @@ module data_path(
     // Hazard Unit -------------------------------------------------------- //
     // -------------------------------------------------------------------- //
 
-    // FIXME: forwarding is not working!!!!!
+    // FIXME: must handle unconditional jumps!
     logic is_hazy_l;
     hazy_unit hu(
         // INPUTS
@@ -184,7 +185,7 @@ module data_path(
     if_id_flopenr #(32) fd_flopenr(
         .clk_i(clk_i)
         ,.reset_i(reset_i)
-        ,.flush_i(pc_beq_i)
+        ,.flush_i(flush_fetch_ld)
         ,.en_i(!stall_ld)
         
         // FETCH
@@ -213,6 +214,7 @@ module data_path(
         ,.enable_wreg_iwb(enable_wreg_lwb)
         
         ,.branch_o(branch_o)
+        // FIXME: zero is broken cause branch forwarding/stalling is broken.
         ,.zero_o(zero_o)
         ,.op_o6(op_o6)
         ,.funct_o6(funct_o6)
@@ -222,6 +224,9 @@ module data_path(
         ,.sign_imm_o32(sign_imm_ld32)
         ,.se_shamt_o32(se_shamt_ld32)
     );
+
+    // FIXME: jump is not working!
+    assign flush_fetch_ld = pc_beq_i | pc_j_i;
 
     // Stage Transition: DECODE -> EXECUTE.
     id_ex_flopr #(32) de_flopr (
@@ -362,57 +367,60 @@ module data_path(
     mux2 #(32) res_mux(alu_out_lwb32, read_data_lwb32, mem_to_reg_lwb,
                        res_lwb32);
 
+    
+    // TODO: remove when done with op implementations.
     always @(posedge clk_i)
     begin
 		$display("\n\n");
+        $display("DP: [[ POSEDGE ]]: ");
         $display("DP: instr_i32: ", instr_i32);
         $display("DP: instr_ld32: ", instr_ld32);
         case(instr_i32[31:26])
             `INSTR_RTYPE: 
             begin
                 case(instr_i32[5:0])
-                    `FUNCT6_ADD: $display("iADD");
-                    `FUNCT6_SUB: $display("iSUB");
-                    `FUNCT6_AND: $display("iAND");
-                    `FUNCT6_OR:  $display("iOR");
-                    `FUNCT6_NOR: $display("iNOR");
-                    `FUNCT6_XOR: $display("iXOR");
-                    `FUNCT6_SLT: $display("iSLT");
-                    `FUNCT6_SLL: $display("iSLL");
-                    `FUNCT6_SRL: $display("iSRL");
+                    `FUNCT6_ADD: $display("DP: <<< iADD >>>");
+                    `FUNCT6_SUB: $display("DP: <<< iSUB >>>");
+                    `FUNCT6_AND: $display("DP: <<< iAND >>>");
+                    `FUNCT6_OR:  $display("DP: <<< iOR >>>");
+                    `FUNCT6_NOR: $display("DP: <<< iNOR >>>");
+                    `FUNCT6_XOR: $display("DP: <<< iXOR >>>");
+                    `FUNCT6_SLT: $display("DP: <<< iSLT >>>");
+                    `FUNCT6_SLL: $display("DP: <<< iSLL >>>");
+                    `FUNCT6_SRL: $display("DP: <<< iSRL >>>");
                 endcase
             end 
-            `INSTR_LW:    $display("iLW");    
-            `INSTR_SW:    $display("iSW");    
-            `INSTR_BEQ:   $display("iBEQ");
-            `INSTR_BNE:   $display("iBNE");  
-            `INSTR_J:     $display("iJ");     
-            `INSTR_ADDI:  $display("iADDI"); 
-            `INSTR_SLTI:  $display("iSLTI");  
-            default:      $display("iNO_MATCH");
+            `INSTR_LW:    $display("DP: <<< iLW >>>");    
+            `INSTR_SW:    $display("DP: <<< iSW >>>");    
+            `INSTR_BEQ:   $display("DP: <<< iBEQ >>>");
+            `INSTR_BNE:   $display("DP: <<< iBNE >>>");  
+            `INSTR_J:     $display("DP: <<< iJ >>>");     
+            `INSTR_ADDI:  $display("DP: <<< iADDI >>>"); 
+            `INSTR_SLTI:  $display("DP: <<< iSLTI >>>");  
+            default:      $display("DP: <<< iNO_MATCH >>>");
         endcase
         case(instr_ld32[31:26])
             `INSTR_RTYPE: begin
                 case(instr_ld32[5:0])
-                    `FUNCT6_ADD: $display("dADD");
-                    `FUNCT6_SUB: $display("dSUB");
-                    `FUNCT6_AND: $display("dAND");
-                    `FUNCT6_OR:  $display("dOR");
-                    `FUNCT6_NOR: $display("dNOR");
-                    `FUNCT6_XOR: $display("dXOR");
-                    `FUNCT6_SLT: $display("dSLT");
-                    `FUNCT6_SLL: $display("dSLL");
-                    `FUNCT6_SRL: $display("dSRL");
+                    `FUNCT6_ADD: $display("DP: <<< dADD >>>");
+                    `FUNCT6_SUB: $display("DP: <<< dSUB >>>");
+                    `FUNCT6_AND: $display("DP: <<< dAND >>>");
+                    `FUNCT6_OR:  $display("DP: <<< dOR >>>");
+                    `FUNCT6_NOR: $display("DP: <<< dNOR >>>");
+                    `FUNCT6_XOR: $display("DP: <<< dXOR >>>");
+                    `FUNCT6_SLT: $display("DP: <<< dSLT >>>");
+                    `FUNCT6_SLL: $display("DP: <<< dSLL >>>");
+                    `FUNCT6_SRL: $display("DP: <<< dSRL >>>");
                 endcase
             end 
-            `INSTR_LW:    $display("dLW");    
-            `INSTR_SW:    $display("dSW");    
-            `INSTR_BEQ:   $display("dBEQ");
-            `INSTR_BNE:   $display("dBNE");  
-            `INSTR_J:     $display("dJ");     
-            `INSTR_ADDI:  $display("dADDI"); 
-            `INSTR_SLTI:  $display("dSLTI");  
-            default:      $display("dNO_MATCH");
+            `INSTR_LW:    $display("DP: <<< dLW >>>");    
+            `INSTR_SW:    $display("DP: <<< dSW >>>");    
+            `INSTR_BEQ:   $display("DP: <<< dBEQ >>>");
+            `INSTR_BNE:   $display("DP: <<< dBNE >>>");  
+            `INSTR_J:     $display("DP: <<< dJ >>>");     
+            `INSTR_ADDI:  $display("DP: <<< dADDI >>>"); 
+            `INSTR_SLTI:  $display("DP: <<< dSLTI >>>");  
+            default:      $display("DP: <<< dNO_MATCH >>>");
         endcase
         $display("\n");
         $display("DP: rd1_ld32: ", rd1_ld32);
@@ -427,10 +435,11 @@ module data_path(
         $display("DP: alu_out_lm32: ", alu_out_lm32);
         $display("DP: alu_out_o32: ", alu_out_o32);
 
-        //$display("DP: enable_wmem_i: ", enable_wmem_i);
-        //$display("DP: enable_wmem_le: ", enable_wmem_le);
-        //$display("DP: enable_wmem_lm: ", enable_wmem_lm);
-        //$display("DP: enable_wmem_o: ", enable_wmem_o);
+        $display("\n");
+        $display("DP: enable_wmem_i: ", enable_wmem_i);
+        $display("DP: enable_wmem_le: ", enable_wmem_le);
+        $display("DP: enable_wmem_lm: ", enable_wmem_lm);
+        $display("DP: enable_wmem_o: ", enable_wmem_o);
         
         $display("\n");
         $display("DP: enable_wreg_i: ", enable_wreg_i);
@@ -450,113 +459,76 @@ module data_path(
 
         $display("\n");
         $display("DP: forward_src_b_le2: ", forward_src_b_le2);
+
+        $display("\n");
+        $display("DP: pc_beq_i: ", pc_beq_i);
+        $display("DP: branch_i: ", branch_i);
+        $display("DP: zero_o: ", zero_o);
+        $display("DP: pc_j_i: ", pc_j_i);
+        $display("DP: flush_fetch_ld: ", flush_fetch_ld);
+
+        $display("\n");
+        $display("DP: stall_lf: ", stall_lf);
+        $display("DP: stall_ld: ", stall_ld);
+        $display("DP: flush_le: ", flush_le);
+        $display("DP: is_hazy_l: ", is_hazy_l);
     end
-    
 
-
-    // TODO: remove when done with op implementations.
-    /*
-    always @(posedge clk_i)
+    always @(negedge clk_i)
     begin
-        // FIXME: BEQ is causing issues with pipeline hazards.
-        //$display("\n\n");
-        $display("instr_ld32: %b", instr_ld32);
-        case(instr_ld32[31:26])
-            `INSTR_RTYPE: $display("RTYPE"); 
-            `INSTR_LW:    $display("LW");    
-            `INSTR_SW:    $display("SW");    
-            `INSTR_BEQ:   $display("BEQ");
-            `INSTR_BNE:   $display("BNE");  
-            `INSTR_J:     $display("J");     
-            `INSTR_ADDI:  $display("ADDI"); 
-            `INSTR_SLTI:  $display("SLTI");  
-            default: $display("What you doin bruh!!?");
+        $display("\n");
+        $display("DP: [[ NEGEDGE ]]: ");
+        $display("DP: stall_lf: ", stall_lf);
+        $display("DP: stall_ld: ", stall_ld);
+        $display("DP: flush_le: ", flush_le);
+        $display("DP: is_hazy_l: ", is_hazy_l);
+
+        case(instr_i32[31:26])
+            `INSTR_RTYPE: 
+            begin
+                case(instr_i32[5:0])
+                    `FUNCT6_ADD: $display("DP: <<< iADD >>>");
+                    `FUNCT6_SUB: $display("DP: <<< iSUB >>>");
+                    `FUNCT6_AND: $display("DP: <<< iAND >>>");
+                    `FUNCT6_OR:  $display("DP: <<< iOR >>>");
+                    `FUNCT6_NOR: $display("DP: <<< iNOR >>>");
+                    `FUNCT6_XOR: $display("DP: <<< iXOR >>>");
+                    `FUNCT6_SLT: $display("DP: <<< iSLT >>>");
+                    `FUNCT6_SLL: $display("DP: <<< iSLL >>>");
+                    `FUNCT6_SRL: $display("DP: <<< iSRL >>>");
+                endcase
+            end 
+            `INSTR_LW:    $display("DP: <<< iLW >>>");    
+            `INSTR_SW:    $display("DP: <<< iSW >>>");    
+            `INSTR_BEQ:   $display("DP: <<< iBEQ >>>");
+            `INSTR_BNE:   $display("DP: <<< iBNE >>>");  
+            `INSTR_J:     $display("DP: <<< iJ >>>");     
+            `INSTR_ADDI:  $display("DP: <<< iADDI >>>"); 
+            `INSTR_SLTI:  $display("DP: <<< iSLTI >>>");  
+            default:      $display("DP: <<< iNO_MATCH >>>");
         endcase
-
-        if (instr_ld32[5:0] == `FUNCT6_SLL && instr_ld32[31:26] == `INSTR_RTYPE)
-        begin
-            $display("INSTR_SLL");
-            //$display("src_a_le32 value: ", src_a_le32);
-            //$display("src_a_le32 value binary: %b", src_a_le32);
-            //$display("src_b_le32 value: ", src_b_le32);
-            //$display("src_b_le32 value: binary: %b", src_b_le32);
-            $display("se_shamt_le32: ", se_shamt_le32);
-            $display("alu_out_o32: ", alu_out_o32);
-            $display("res_lwb32: ", res_lwb32);
-            $display("res_lwb32: binary: %b", res_lwb32);
-            $display("write_data_o32: ", write_data_o32);
-            $display("write_data_o32: binary: %b", write_data_o32);
-            $display("apply_shift_le: ", apply_shift_le);
-            $display("enable_wreg_lwb: ", enable_wreg_lwb);
-            $display("dst_reg_addr_lwb5 ", dst_reg_addr_lwb5);
-        end
-
-        else if (instr_ld32[5:0] == `FUNCT6_SRL && instr_ld32[31:26] == `INSTR_RTYPE)
-        begin
-            $display("INSTR_SRL");
-            //$display("src_a_le32 value: ", src_a_le32);
-            //$display("src_a_le32 value binary: %b", src_a_le32);
-            //$display("src_b_le32 value: ", src_b_le32);
-            //$display("src_b_le32 value: binary: %b", src_b_le32);
-            $display("se_shamt_le32: ", se_shamt_le32);
-            $display("alu_out_o32: ", alu_out_o32);
-            $display("res_lwb32: ", res_lwb32);
-            $display("res_lwb32: binary: %b", res_lwb32);
-            $display("write_data_o32: ", write_data_o32);
-            $display("write_data_o32: binary: %b", write_data_o32);
-            $display("apply_shift_le: ", apply_shift_le);
-            $display("enable_wreg_lwb: ", enable_wreg_lwb);
-            $display("dst_reg_addr_lwb5 ", dst_reg_addr_lwb5);
-        end
-
-        else if (instr_ld32[31:26] == `INSTR_SW)
-        begin
-            $display("INSTR_SW");
-            //$display("src_a_le32 value: ", src_a_le32);
-            //$display("src_a_le32 value binary: %b", src_a_le32);
-            //$display("src_b_le32 value: ", src_b_le32);
-            //$display("src_b_le32 value: binary: %b", src_b_le32);
-            $display("se_shamt_le32: ", se_shamt_le32);
-            $display("alu_out_o32: ", alu_out_o32);
-            $display("res_lwb32: ", res_lwb32);
-            $display("res_lwb32: binary: %b", res_lwb32);
-            $display("write_data_o32: ", write_data_o32);
-            $display("write_data_o32: binary: %b", write_data_o32);
-            $display("apply_shift_le: ", apply_shift_le);
-            $display("enable_wreg_lwb: ", enable_wreg_lwb);
-            $display("dst_reg_addr_lwb5 ", dst_reg_addr_lwb5);
-        end
-
-        else if (instr_ld32[31:26] == `INSTR_LW)
-        begin
-            $display("INSTR_LW");
-            //$display("src_a_le32 value: ", src_a_le32);
-            //$display("src_a_le32 value binary: %b", src_a_le32);
-            //$display("src_b_le32 value: ", src_b_le32);
-            //$display("src_b_le32 value: binary: %b", src_b_le32);
-            $display("se_shamt_le32: ", se_shamt_le32);
-            $display("alu_out_o32: ", alu_out_o32);
-            $display("res_lwb32: ", res_lwb32);
-            $display("res_lwb32: binary: %b", res_lwb32);
-            $display("write_data_o32: ", write_data_o32);
-            $display("write_data_o32: binary: %b", write_data_o32);
-            $display("apply_shift_le: ", apply_shift_le);
-            $display("enable_wreg_lwb: ", enable_wreg_lwb);
-            $display("dst_reg_addr_lwb5 ", dst_reg_addr_lwb5);
-        end
-        else if (instr_ld32[31:26] == `INSTR_J)
-            $display("JUMPING BRUH");
-        else
-        begin
-            $display("NO MATCH FOUND");
-            $display("INSTR IS: ");
-            case (instr_ld32[31:26])
-                `INSTR_ADDI: $display("INSTR_ADDI");
-                `INSTR_BEQ: $display("INSTR_BEQ");
-                `INSTR_BNE: $display("INSTR_BNE");
-                default: $display("NO CASE");
-            endcase
-        end
+        case(instr_ld32[31:26])
+            `INSTR_RTYPE: begin
+                case(instr_ld32[5:0])
+                    `FUNCT6_ADD: $display("DP: <<< dADD >>>");
+                    `FUNCT6_SUB: $display("DP: <<< dSUB >>>");
+                    `FUNCT6_AND: $display("DP: <<< dAND >>>");
+                    `FUNCT6_OR:  $display("DP: <<< dOR >>>");
+                    `FUNCT6_NOR: $display("DP: <<< dNOR >>>");
+                    `FUNCT6_XOR: $display("DP: <<< dXOR >>>");
+                    `FUNCT6_SLT: $display("DP: <<< dSLT >>>");
+                    `FUNCT6_SLL: $display("DP: <<< dSLL >>>");
+                    `FUNCT6_SRL: $display("DP: <<< dSRL >>>");
+                endcase
+            end 
+            `INSTR_LW:    $display("DP: <<< dLW >>>");    
+            `INSTR_SW:    $display("DP: <<< dSW >>>");    
+            `INSTR_BEQ:   $display("DP: <<< dBEQ >>>");
+            `INSTR_BNE:   $display("DP: <<< dBNE >>>");  
+            `INSTR_J:     $display("DP: <<< dJ >>>");     
+            `INSTR_ADDI:  $display("DP: <<< dADDI >>>"); 
+            `INSTR_SLTI:  $display("DP: <<< dSLTI >>>");  
+            default:      $display("DP: <<< dNO_MATCH >>>");
+        endcase
     end
-    */
 endmodule

@@ -15,7 +15,7 @@ module if_id_flopenr #(parameter WIDTH=8)(
     ,output logic [WIDTH-1:0] pc_plus4_od32
     );
 
-    always_ff @(posedge clk_i, posedge reset_i, posedge flush_i)
+    always_ff @(posedge clk_i, posedge reset_i)
         if (reset_i || flush_i) 
         begin
             instr_od32 <= 0;

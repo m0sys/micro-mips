@@ -41,7 +41,7 @@ module id_ex_flopr #(parameter WIDTH=8)(
     ,output logic             reg_dst_rtrd_oe
     );
 
-    always_ff @(posedge clk_i, posedge reset_i, posedge flush_i)
+    always_ff @(posedge clk_i, posedge reset_i)
         if (reset_i || flush_i) 
         begin
             funct_oe6 <= 0;

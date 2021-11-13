@@ -79,6 +79,8 @@ module decode_stage(
         $display("DP: DS: alu_out_im32: ", alu_out_im32);
         $display("DP: DS: forward_rd1_id: ", forward_rd1_id);
         $display("DP: DS: forward_rd2_id: ", forward_rd2_id);
+        $display("DP: DS: forwarding_rd1_l32: ", forwarding_rd1_l32);
+        $display("DP: DS: forwarding_rd2_l32: ", forwarding_rd2_l32);
         $display("DP: DS: rs: ", instr_id32[25:21]);
         $display("DP: DS: rt: ", instr_id32[20:16]);
     end

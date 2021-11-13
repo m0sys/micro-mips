@@ -35,6 +35,8 @@ module hazy_unit(
     assign lw_stall_l = ((rs_id5 === rt_ie5) || (rt_id5 === rt_ie5)) && mem_to_reg_ie;
 
     // Forwarding logic for branch arguments.
+    // FIXME: this forwarding ain't working!!!
+    // MIGHT BE AN ISSUE WITH BRANCH STALL.
     assign forward_rd1_o = (rs_id5 != 0)
                         && (rs_id5 == dst_reg_addr_im5) 
                         && enable_wreg_im;
