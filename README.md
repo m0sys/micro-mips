@@ -12,9 +12,9 @@
 
 The following are the available microarchitectures that are able to run the basic mips assembly program.
 
-. [Single-cycle Microprocessor Uarch](https://github.com/m0sys/micro-mips/tree/master/uarchs/scp)
-. [Multi-cycle Microprocessor Uarch](https://github.com/m0sys/micro-mips/tree/master/uarchs/mcp)
-. [Pipelined Microprocessor Uarch](https://github.com/m0sys/micro-mips/tree/master/uarchs/pp)
+- [Single-cycle Microprocessor Uarch](https://github.com/m0sys/micro-mips/tree/master/uarchs/scp)
+- [Multi-cycle Microprocessor Uarch](https://github.com/m0sys/micro-mips/tree/master/uarchs/mcp)
+- [Pipelined Microprocessor Uarch](https://github.com/m0sys/micro-mips/tree/master/uarchs/pp)
 
 ## Author
 
